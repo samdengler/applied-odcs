@@ -35,5 +35,9 @@ bundle:
 	lambda/bundle.sh
 	uv run python lambda/smoke.py
 
-synth deploy users token call record demo:
+synth: bundle
+	cd infra && npx cdk synth --quiet
+	uv run python scripts/check_synth.py
+
+deploy users token call record demo:
 	@echo "make $@: not built yet (see docs/plan.md, Work order)"; exit 1
