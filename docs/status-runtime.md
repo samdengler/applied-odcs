@@ -1,18 +1,42 @@
 # Runtime port status
 
-The run of `docs/plan-runtime.md` on branch `runtime-mcp`, in the worktree at `~/src/github.com/samdengler/applied-odcs-runtime`, started October 18, 2026 from tag `demo-lambda-target` (`e8126a9`).  Each entry says what the plan asked, what was done, and what was observed.
+The run of `docs/plan-runtime.md` on branch `runtime-mcp`, in the worktree at `~/src/github.com/samdengler/applied-odcs-runtime`, on October 18, 2026, from tag `demo-lambda-target` (`e8126a9`).  Each entry says what the plan asked, what was done, and what was observed.
+
+## Read first
+
+1. Live comparison (below): the eight calls through the MCP server target decide exactly as through the Lambda function target, on cedar-odcs v0.2.5.
+2. Step 5: why v0.2.4 withheld every list from FastMCP, and the fix.
+3. Step 6: every tool call gets a new Runtime session, so in-memory writes are lost and the median call is about four times slower.
+4. Open questions for the bundle loader plan, at the end.
 
 ## Steps
 
-| Step | State | Commit |
+| Step | State | Commits |
 | --- | --- | --- |
-| 1. Variant switch and baseline | done | see `git log` |
-| 2. Orders MCP server | done | see `git log` |
-| 3. Runtime, M2M client, and MCP server target | done, after step 5 | see `git log` |
-| 4. Live calls and comparison | done on v0.2.5: eight of eight outcomes match | see `git log` |
-| 5. cedar-odcs fix | done: v0.2.5, run before step 4 | cedar-odcs `63bdc08`, tag `v0.2.5` |
-| 6. Demo, writes, and latency | done | see `git log` |
-| 7. Close | | |
+| 1. Variant switch and baseline | done | `62303c5` |
+| 2. Orders MCP server | done | `d33d482` |
+| 3. Runtime, M2M client, and MCP server target | done, after step 5 | `20cabe2`, `b779549` |
+| 4. Live calls and comparison | done on v0.2.5: eight of eight outcomes match | `23d9f3b` |
+| 5. cedar-odcs fix | done: v0.2.5, run before step 4 | cedar-odcs `63bdc08`, tag `v0.2.5`; the pin is in `20cabe2` |
+| 6. Demo, writes, and latency | done | `903d9dd` |
+| 7. Close | done | the closing commit on `runtime-mcp`, pushed |
+
+## What is deployed
+
+Stack `AppliedOdcsRuntime` in account 009080466601 (the default profile's SSO account), us-east-1, plain aws-cdk-lib 2.273.0, interceptors on cedar-odcs v0.2.5.  `AppliedOdcs` is unchanged and still deployed from the main checkout; this session deployed nothing to it.
+
+| Output | Value |
+| --- | --- |
+| GatewayUrl | `https://applied-odcs-runtime-dqm57bvsfy.gateway.bedrock-agentcore.us-east-1.amazonaws.com/mcp` |
+| GatewayId | `applied-odcs-runtime-dqm57bvsfy` (target `orders`, `DBK9EXVI3G`, `READY`) |
+| UserPoolId | `us-east-1_Fs1wXDVBY` (pool `applied-odcs-runtime`) |
+| ClientId | `2ls1ouutvh4fig2n7ln2aouoai` (users) |
+| M2MClientId | `r1r5s5brui7qjk8ncl2vt535q` (Gateway to Runtime) |
+| TokenEndpoint | `https://applied-odcs-runtime-009080466601.auth.us-east-1.amazoncognito.com/oauth2/token` |
+| RuntimeArn | `arn:aws:bedrock-agentcore:us-east-1:009080466601:runtime/applied_odcs_runtime_orders-T2FW6DHYSp` |
+| RuntimeLogGroup | `/aws/bedrock-agentcore/runtimes/applied_odcs_runtime_orders-T2FW6DHYSp-DEFAULT` |
+
+Users: Alice (no groups), Carol (`support`, `employee`), Dave (`finance`, `employee`), from `make users VARIANT=runtime`.  Teardown, not run: `cd infra && npx cdk -c variant=runtime destroy AppliedOdcsRuntime`.  The OAuth2 credential provider and the container image in the CDK assets repository are worth checking after a teardown.
 
 ### Step 1
 
@@ -177,3 +201,13 @@ Envelope findings, printed by `compare_live.py` and not failing it:
 ## Secrets
 
 The runtime stack's demo password and the M2M client secret are in `.env.applied-odcs-runtime` at the worktree root, ignored by git, mode 600.  `.claude/settings.json` denies reading it.
+
+## Open questions for the bundle loader plan
+
+- **A Runtime session per tool call.**  The Gateway opens a new Runtime session for every `tools/call`, with a fresh server process.  That costs about 1.2 s per call against the Lambda function target, with six-second outliers, and makes in-memory state useless, so production gap 0.1 (records in a deployed store) is required, not optional.  Open: whether the Gateway can be made to reuse a Runtime session (a session header, or the target's configuration), and whether `lifecycleConfiguration` or a lighter image shortens the start.
+- **Output schemas the Gateway serves.**  An MCP server target's tool schemas come from the server's `tools/list`, so callers see FastMCP's schemas (`additionalProperties: true` objects, and `{"result": array}` for the list), not `orders/tools.json`.  The cedar-odcs tool schema gate still checks `tools.json`.  The bundle could have the server declare the contract's output schema (typed return models generated from the contract), or the gate could read the server's `tools/list`.
+- **The `{"result": [...]}` wrapping.**  v0.2.5 unwraps it for a list tool.  A server that returns a list some other way (no structured output, text items only) would still be withheld, since only the first text item is read.  The bundle should fix the server's result shape, and cedar-odcs should have a test per supported shape.
+- **mcp 2.x.**  The server is on mcp 1.30.0 because 2.x renamed FastMCP to `MCPServer`.  The bundle should pick one, and the Runtime examples it follows.
+- **Resynchronizing tools (K6).**  A change to the server's tools needs `SynchronizeGatewayTargets` or a target update.  Redeploying the Runtime image alone leaves the Gateway's catalog stale.  Not exercised here.
+- **The Token Vault secret grant.**  The Gateway role may read any `bedrock-agentcore-identity!*` secret in the account, because the credential provider's secret ARN is a deploy-time token.  The Delta construct's grant should be compared.
+- **The credential provider vendor.**  `CognitoOauth2` served the client credentials grant, though the AgentCore docs show it only for the authorization code grant.  Delta uses Ping, which maps to `OAuth2CredentialProvider.usingPingOne` or `usingCustom`; that mapping is unverified.

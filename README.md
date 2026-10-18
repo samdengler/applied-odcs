@@ -27,6 +27,34 @@ policies; it needs cargo, cvc5, and a cedar-odcs checkout at
 `.env.applied-odcs`, which git ignores; `.env.applied-odcs.example`
 lists the names.
 
+## Runtime variant
+
+The `runtime-mcp` branch ports the tool to an MCP server on AgentCore
+Runtime: `orders/server/server.py` (FastMCP) in a container, behind the
+same Gateway, interceptors, and Cognito users, with an MCP server target
+that calls the Runtime with an OAuth token from a Cognito M2M client.  It
+deploys as a second stack, `AppliedOdcsRuntime`, with every name prefixed
+`applied-odcs-runtime`.  Every AWS target takes `VARIANT=runtime`, and on
+this branch `make deploy` refuses to run without it.
+
+```sh
+make server-smoke                              # the MCP server on the Mac, initialize and tools/list over HTTP
+make synth VARIANT=runtime                     # AppliedOdcsRuntime, checked by scripts/check_synth.py
+make compare-baseline                          # the default variant still synthesizes the demo-lambda-target tag's template
+make deploy VARIANT=runtime && make users VARIANT=runtime
+make tools VARIANT=runtime USER=carol          # tools/list through the Gateway
+make call VARIANT=runtime USER=carol TOOL=list_orders
+make record VARIANT=runtime USER=... TOOL=...  # into orders/tests/events/runtime/
+make compare-live                              # each runtime recording against its Lambda function target recording
+make latency VARIANT=runtime USER=carol        # ten timed tools/call round trips
+make demo VARIANT=runtime
+```
+
+The runtime stack's outputs, demo password, and M2M client secret go to
+`.env.applied-odcs-runtime`, which git ignores.  The plan is
+`docs/plan-runtime.md`; what was built and observed is
+`docs/status-runtime.md`.
+
 ## Layout
 
 - `orders/` is the governed tool, the folder a tool team copies: the
