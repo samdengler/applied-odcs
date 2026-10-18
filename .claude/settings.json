@@ -1,0 +1,53 @@
+{
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Bash(uv:*)",
+      "Bash(uvx:*)",
+      "Bash(python3:*)",
+      "Bash(make:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(node:*)",
+      "Bash(cdk:*)",
+      "Bash(aws:*)",
+      "Bash(git:*)",
+      "Bash(gh:*)",
+      "Bash(bd:*)",
+      "Bash(cargo:*)",
+      "Bash(rsync:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(rm -rf build:*)",
+      "Bash(rm -rf infra/cdk.out:*)",
+      "Bash(chmod:*)",
+      "Bash(jq:*)",
+      "Bash(curl:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(diff:*)",
+      "Bash(sed:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(sleep:*)",
+      "Bash(date:*)",
+      "Bash(openssl rand:*)",
+      "WebFetch(domain:docs.aws.amazon.com)",
+      "WebFetch(domain:code.claude.com)",
+      "WebFetch(domain:pypi.org)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:github.com)"
+    ],
+    "deny": [
+      "Bash(cdk destroy:*)",
+      "Bash(git push --force:*)",
+      "Bash(rm -rf /:*)",
+      "Bash(rm -rf ~:*)",
+      "Read(./.env.applied-odcs)"
+    ]
+  }
+}
