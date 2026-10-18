@@ -17,7 +17,7 @@ cedar-odcs, on `main`, pushed to github.com/samdengler/cedar-odcs, each tag afte
 
 Each change has a closed Beads issue in cedar-odcs.
 
-applied-odcs, on `main`, pushed to the new private repository github.com/samdengler/applied-odcs: thirteen commits, `b84dd30` (skeleton) to the closing commit, one or more per Work order step.  The sample pins cedar-odcs `v0.2.4`, and the deployed stack was built from that tag.
+applied-odcs, on `main`, pushed to the new private repository github.com/samdengler/applied-odcs: eleven commits, `b84dd30` (skeleton) to `c7e1531` (close), one per Work order step except step 12's status-only fix that follows.  The sample pins cedar-odcs `v0.2.4`, and the deployed stack was built from that tag.
 
 ## What is deployed
 
