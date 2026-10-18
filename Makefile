@@ -57,5 +57,6 @@ call:
 record:
 	uv run --env-file $(ENV) python -P client/record.py $(USER) $(TOOL) '$(ARGS)'
 
+# docs/demo.md end to end, against the deployed Gateway.
 demo:
-	@echo "make demo: not built yet (see docs/plan.md, Work order step 9)"; exit 1
+	scripts/demo.sh

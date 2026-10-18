@@ -6,26 +6,58 @@ The run of `docs/plan.md`, Work order steps 1 to 12, on October 17 and 18, 2026.
 
 (Filled in at step 12.)
 
+## What is deployed
+
+Stack `AppliedOdcs` in account 009080466601 (the default profile's SSO account), us-east-1, from plain aws-cdk-lib 2.273.0 and aws-cdk 2.1145.0.  The account was already bootstrapped (`CDKToolkit`, bootstrap version 32).
+
+| Output | Value |
+| --- | --- |
+| GatewayUrl | `https://applied-odcs-qfff07owsu.gateway.bedrock-agentcore.us-east-1.amazonaws.com/mcp` |
+| GatewayId | `applied-odcs-qfff07owsu` (status `READY`) |
+| UserPoolId | `us-east-1_t89ljprDM` |
+| ClientId | `2tbbt4giajvkmb3bg2mhmcom89` |
+| Region | `us-east-1` |
+
+Resources: one Cognito user pool with the app client and the groups `support`, `finance`, `employee`; the `OrdersTool` Lambda; the `RequestInterceptor` and `ResponseInterceptor` Lambdas (Python 3.12, arm64, 512 MB, the cedar-odcs bundle); the Gateway in MCP mode with the Cognito JWT authorizer, `exceptionLevel: DEBUG`, both interceptors with `passRequestHeaders: true`; the `orders` Lambda target with `orders/tools.json`; three log groups with one-week retention.
+
+Users: `alice` (no groups), `carol` (`support`, `employee`), `dave` (`finance`, `employee`), created by `make users`, permanent passwords.
+
+The demo password is in `.env.applied-odcs` at the repository root, under `APPLIED_ODCS_PASSWORD`.  The file is ignored by git, mode 600, and also holds the stack outputs.  `scripts/env.py` generated the password on the first deploy and keeps it across deploys.  `.env.applied-odcs.example` lists the names.
+
+Teardown, not run: `cd infra && npx cdk destroy AppliedOdcs`.  The user pool and log groups have `RemovalPolicy.DESTROY`, so nothing is left behind.
+
+## What passed
+
+- Step 1: cedar-odcs `./check.sh` green at v0.2.0, v0.2.1, and v0.2.2 (724 tests at v0.2.2, every use case's check, 211 history proofs).
+- Step 2: `uv run cedar-odcs --help` from the sample.
+- Step 3: the copied corpus, 75 cases, unchanged; the interceptor tests on every regenerated event; the carol-for-alice `dry-run` prints order-1001 and order-3003 with seven fields each.
+- Step 4: `test_tool.py`, `list_orders` returns five rows with all nine fields.
+- Step 5: `make bundle`; the Linux arm64 cedarpy wheel is in `build/lambda/cedarpy/`, and `lambda/smoke.py` runs the bundle's own response handler on a fixture with the Mac's cedarpy standing in.
+- Step 6: `make synth`; `scripts/check_synth.py` asserts one Gateway, REQUEST and RESPONSE interceptors with `PassRequestHeaders: true`, target `orders`, one user pool.
+- Step 7: `make deploy`, `make users`; `get-gateway` shows `READY`; `make token USER=alice` decodes with `username: alice`.
+- Step 8: the six live calls below, recorded; `make check` passes with them (121 tests).
+- Step 9: `make demo` runs `docs/demo.md` end to end against the Gateway.
+
 ## Defaults taken
 
 - **cedar-odcs venv and analysis build.**  The cedar-odcs checkout's `.venv` and `analysis/target` were built when the repository was named `cedar-osdc`; `pytest` had a stale shebang and the prover looked for cvc5 under the old path.  Both were rebuilt locally (ignored paths, nothing committed).  `./check.sh` was green before any change: 712 tests, 211 history proofs.
 - **Record switch in v0.2.0.**  The plan puts `CEDAR_ODCS_RECORD` in Build and check but not in a Work order step.  It landed in cedar-odcs before the `v0.2.0` tag, as its own commit, so the first bundle carries it.  The Lambda entry point sets the `cedar-odcs` logger to INFO (DEBUG with the switch), since the Lambda runtime's root logger does not show INFO from a library logger otherwise.
-- **`check` from an installed cedar-odcs (v0.2.1).**  `cedar-odcs check orders` from the sample ran `pull`, which rewrites `contract/order.odcs.yaml` from `contract/unity/`, and then `prove`, which failed because an installed package has no `analysis/` crate beside it.  cedar-odcs `v0.2.1` adds `check --skip pull --skip prove` and `CEDAR_ODCS_ANALYSIS`.  The sample's `make check` skips both: its contract is the source (decision 11), and `make prove` points `CEDAR_ODCS_ANALYSIS` at `../cedar-odcs/analysis`.  `PULL` stays in `usecase.py` so `cedar-odcs pull orders` still shows the catalog path.  Because of this extra tag, the grants work is tagged `v0.2.2` and the tool-schema gate `v0.2.3` (the plan said `v0.2.1` and `v0.2.2`).
+- **`check` from an installed cedar-odcs (v0.2.1).**  `cedar-odcs check orders` from the sample ran `pull`, which rewrites `contract/order.odcs.yaml` from `contract/unity/`, and then `prove`, which failed because an installed package has no `analysis/` crate beside it.  cedar-odcs `v0.2.1` adds `check --skip pull --skip prove` and `CEDAR_ODCS_ANALYSIS`.  The sample's `make check` skips both: its contract is the source (decision 11), and `make prove` points `CEDAR_ODCS_ANALYSIS` at `../cedar-odcs/analysis`.  `PULL` stays in `usecase.py` so `cedar-odcs pull orders` still shows the catalog path.  Because of this tag and the v0.2.2 fix below, the grants work is tagged `v0.2.3` and the tool-schema gate `v0.2.4` (the plan said `v0.2.1` and `v0.2.2`).
 - **Copied tests that could not stay unchanged.**  `test_interceptor.py` and `test_corpus.py` import `orders.usecase` (they imported `usecases.orders.usecase`).  `test_policies_and_entities_are_the_proven_ones` was removed from `test_interceptor.py`: it compares against cedar-odcs's `history/`, which is not here.  `test_build.py` was rewritten: the cedar-odcs version compares committed generated files and the history chain, and here nothing generated is committed.  It now checks that build writes the schema, maps, and entities, and that every one of the nine leaves has a known level and a writer.  The corpus (`tests/test-cases/`) is unchanged and passes: 75 cases.
 - **Build before tests.**  A root `conftest.py` builds `orders/contract/generated/` and `orders/entities.json` from the contract before any test loads the use case, so `uv run pytest` works on a fresh clone.
 - **Identity files.**  Carol's identity carries `cognito:groups: [support]` and Dave's `[finance]`, as the plan's Identities and events section says; the live pool also puts both in `employee`.  UUIDs and the client id in the fixtures are made up.
-
 - **Bundling a local cedar-odcs.**  `lambda/bundle.sh` takes `CEDAR_ODCS_SOURCE` in place of the pinned git URL, so a fix can be tried on the live Gateway before it is tagged.  It must be a wheel (`uv build --wheel` in the checkout), since the install is `--only-binary :all:`.  Used once, for the v0.2.2 fix; every deploy after it came from the tag through `make deploy`.
 - **Client scripts run with `python -P`.**  The plan names `client/token.py`, which shadows the standard library `token` module when the script's directory is on `sys.path`; `-P` leaves it off.  `call.py` and `record.py` load their siblings by path.
 - **Record switch on in the deployed stack.**  `CEDAR_ODCS_RECORD=1` is set on both interceptors so `make record` works; `cdk deploy -c record=false` turns it off.  The logs keep a week and hold bearer tokens while it is on.
 - **Recorded fixtures are redacted.**  `client/record.py` replaces each bearer token's signature with `signature-redacted` and the `X-Forwarded-For` address with `203.0.113.10`.  The token payloads (Cognito UUIDs, the pool issuer, the app client id) are kept; none is a secret.
 - **Each live fixture holds both events and what the client saw.**  `live-<user>-<tool>[-<orderId>].json` carries the request event, the response event (null when the request leg refused), and the observed status and JSON-RPC body.  `test_live_recording_matches_the_local_handlers` in `test_interceptor.py` runs the local handlers on the recorded events and asserts they decide what the live Gateway returned.
 
+- **Demo step 8 changed.**  The plan's step 8 edits the contract and runs `make check` then `make deploy`.  The edit fails two corpus cases ("owner reads cardLast4 of own order", "support agent may not read cardLast4"), so `make check` fails and `make deploy` stops.  `docs/demo.md` shows the edit's effect with `dry-run` and the gate catching it, and says which two cases to update (checked: with them updated the corpus passes) for anyone who wants to deploy the change live.  `make demo` does the edit on a copy under `build/demo/`.
+
 ## Findings against the plan
 
 - **Dave reads nothing.**  The plan expects Dave's `list_orders` to return every row with the five public fields, and his refund to echo public fields.  Under the unchanged policies no permit gives finance `ReadOrder` or `ReadOrderField`, and the guardrail `refund-implies-no-read` proves it.  `dry-run` with `dave.json` drops all three rows (`read denied`) and returns `[]`; the copied `test_finance_list_is_empty` and `test_write_tools_echoing_the_order_are_filtered` pin the same.  The policies were not changed.
 - **Carol sees six fields.**  The plan says seven for Carol.  Public is five (`id`, `owner`, `status`, `total`, `estimatedDelivery`) and internal is one (`internalNotes`), so Carol gets six on every row.  Alice gets seven (five public, two confidential).
-
 - **The Gateway rejected the interceptor's pass-through response (fixed in cedar-odcs v0.2.2).**  The first live call, and every method after it (`initialize`, `tools/list`, `tools/call`), returned `InterceptorException - Received invalid response from interceptor` with HTTP 500, while the logs showed the handlers deciding correctly.  The live response event's `gatewayResponse` carries `path`, `httpMethod`, `headers` (empty), `body`, `statusCode`, and `isStreamingResponse`; the handler echoed all of it back as `transformedGatewayResponse`.  The fixtures written from the documentation had only `statusCode`, `headers`, and `body`, so the tests never saw it.  cedar-odcs v0.2.2 returns only those three fields (and drops empty ones); with that bundle every call succeeds.  This is the plan's "Gateway event shape differs" risk, taken through its named fallback: adjust `handlers.py`, tag, rebundle.
 - **Alice's `get_order` on Bob's order is a 403, not an empty object.**  The plan expected `{}` from the response leg.  The use case's `entities.json` (built from `facts.json`) knows `order-2002` is Bob's, so the request leg's verb round denies `ReadOrder` before the tool runs: `ReadOrder is not permitted for this caller`.  Local `dry-run` with `alice.json` gives the same rejection, so this is the plan's expectation, not a live/local difference.
 - **No live result differed from the local handlers.**  Each of the six live fixtures is replayed through the local handlers by `make check` and matches.
