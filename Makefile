@@ -18,7 +18,7 @@ STACK := $(if $(filter runtime,$(VARIANT)),AppliedOdcsRuntime,AppliedOdcs)
 OUTPUTS := build/outputs$(if $(VARIANT),-$(VARIANT)).json
 CDK := npx cdk -c variant=$(VARIANT)
 
-.PHONY: sync build check prove bundle synth compare-baseline deploy deploy-guard users token call record demo
+.PHONY: sync build check prove bundle server-build server-smoke synth compare-baseline deploy deploy-guard users token call record demo
 
 sync:
 	uv sync
@@ -42,6 +42,16 @@ prove: build
 bundle:
 	lambda/bundle.sh
 	uv run python lambda/smoke.py
+
+# build/server for the Runtime: the MCP server and the tool's one data
+# file, so orders.json has one source.
+server-build:
+	rm -rf build/server && mkdir -p build/server
+	cp orders/server/server.py orders/server/requirements.txt orders/tool/data/orders.json build/server/
+
+# The server from build/server on the Mac, initialize and tools/list over HTTP.
+server-smoke: server-build
+	uv run python scripts/server_smoke.py
 
 synth: bundle
 	cd infra && $(CDK) synth --quiet

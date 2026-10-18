@@ -13,6 +13,8 @@ dependencies = [
 dev = [
     "pytest>=8.0",
     "boto3>=1.35",
+    # orders/server/requirements.txt pins the same version for the Runtime.
+    "mcp==1.30.0",
 ]
 
 [tool.uv]
