@@ -18,7 +18,7 @@ STACK := $(if $(filter runtime,$(VARIANT)),AppliedOdcsRuntime,AppliedOdcs)
 OUTPUTS := build/outputs$(if $(VARIANT),-$(VARIANT)).json
 CDK := npx cdk -c variant=$(VARIANT)
 
-.PHONY: sync build check prove bundle server-build server-smoke synth compare-baseline deploy deploy-guard users token call tools record demo
+.PHONY: sync build check prove bundle server-build server-smoke synth baseline compare-baseline deploy deploy-guard users token call tools record demo
 
 sync:
 	uv sync
@@ -58,8 +58,19 @@ synth: bundle server-build
 	uv run python scripts/check_synth.py infra/cdk.out/$(STACK).template.json
 
 # The default variant must synthesize what the demo-lambda-target tag
-# did.  build/baseline-AppliedOdcs.template.json is make synth's output
-# at the tag, saved before the variant switch went in.
+# did.  make baseline synthesizes the tag's sources from git archive into
+# build/baseline-AppliedOdcs.template.json, with this checkout's
+# node_modules and interceptor bundle; run it with the same AWS
+# credentials as compare-baseline, since CDK writes the account into the
+# template only when it can resolve one.
+baseline: bundle
+	rm -rf build/baseline-tag && mkdir -p build/baseline-tag/build
+	git archive demo-lambda-target | tar -x -C build/baseline-tag
+	ln -s $(CURDIR)/infra/node_modules build/baseline-tag/infra/node_modules
+	cp -R build/lambda build/baseline-tag/build/lambda
+	cd build/baseline-tag/infra && npx cdk synth --quiet
+	cp build/baseline-tag/infra/cdk.out/AppliedOdcs.template.json build/baseline-AppliedOdcs.template.json
+
 compare-baseline:
 	cd infra && npx cdk -c variant= synth --quiet AppliedOdcs
 	uv run python scripts/compare_templates.py build/baseline-AppliedOdcs.template.json infra/cdk.out/AppliedOdcs.template.json
