@@ -3,7 +3,7 @@
 Makes the call through call.call, then reads the two interceptors' logged
 events (the handlers log them when CEDAR_ODCS_RECORD=1) from CloudWatch Logs,
 picks the ones whose JSON-RPC id matches, redacts bearer token signatures, and
-writes orders/tests/events/live-<user>-<tool>[-<orderId>].json.
+writes orders/tests/events/live-<user>-<tool>[-<orderId>][-<field>...].json.
 """
 
 import importlib.util
@@ -94,6 +94,9 @@ def output_name(user: str, tool: str, arguments: dict) -> str:
     name = f"live-{user}-{tool}"
     if arguments.get("orderId"):
         name += f"-{arguments['orderId']}"
+    # Two updates of one order differ only in the fields they set.
+    if isinstance(arguments.get("changes"), dict):
+        name += "".join(f"-{field}" for field in sorted(arguments["changes"]))
     return name + ".json"
 
 

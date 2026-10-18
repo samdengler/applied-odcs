@@ -90,7 +90,7 @@ Teardown, not run: `cd infra && npx cdk destroy AppliedOdcs`.  The user pool and
 - **Carol sees six fields.**  The plan says seven for Carol.  Public is five (`id`, `owner`, `status`, `total`, `estimatedDelivery`) and internal is one (`internalNotes`), so Carol gets six on every row.  Alice gets seven (five public, two confidential).
 - **The Gateway rejected the interceptor's pass-through response (fixed in cedar-odcs v0.2.2).**  The first live call, and every method after it (`initialize`, `tools/list`, `tools/call`), returned `InterceptorException - Received invalid response from interceptor` with HTTP 500, while the logs showed the handlers deciding correctly.  The live response event's `gatewayResponse` carries `path`, `httpMethod`, `headers` (empty), `body`, `statusCode`, and `isStreamingResponse`; the handler echoed all of it back as `transformedGatewayResponse`.  The fixtures written from the documentation had only `statusCode`, `headers`, and `body`, so the tests never saw it.  cedar-odcs v0.2.2 returns only those three fields (and drops empty ones); with that bundle every call succeeds.  This is the plan's "Gateway event shape differs" risk, taken through its named fallback: adjust `handlers.py`, tag, rebundle.
 - **Alice's `get_order` on Bob's order is a 403, not an empty object.**  The plan expected `{}` from the response leg.  The use case's `entities.json` (built from `facts.json`) knows `order-2002` is Bob's, so the request leg's verb round denies `ReadOrder` before the tool runs: `ReadOrder is not permitted for this caller`.  Local `dry-run` with `alice.json` gives the same rejection, so this is the plan's expectation, not a live/local difference.
-- **No live result differed from the local handlers.**  Each of the six live fixtures is replayed through the local handlers by `make check` and matches.
+- **No live result differed from the local handlers.**  Each of the eight live fixtures is replayed through the local handlers by `make check` and matches.
 
 ## Live calls (step 8)
 
@@ -104,8 +104,10 @@ All against the deployed Gateway, recorded to `orders/tests/events/live-*.json`.
 | `alice get_order order-2002` | 403 | `ReadOrder is not permitted for this caller` |
 | `dave refund_order order-1001` | 200 | `{}`: the refund ran upstream and finance reads no field of the order |
 | `alice refund_order order-1001` | 403 | `RefundOrder is not permitted for this caller` |
+| `alice update_order order-1001` setting `shippingAddress` | 200 | the order with Alice's seven fields and the new address |
+| `alice update_order order-1001` setting `internalNotes` | 403 | `UpdateOrder rejected; fields not permitted: internalNotes` |
 
-Dave's refund changes order-1001's `status` to `refunded` in the tool Lambda's memory until its next cold start; later calls show it.
+Dave's refund changes order-1001's `status` to `refunded` in the tool Lambda's memory until its next cold start; later calls show it.  The two `update_order` calls were recorded on October 18, after the run, for demo steps 8 and 9.  Carol acting for Alice updating the order runs with `dry-run` only, as in demo step 7: the address change is forwarded and `internalNotes` is refused.  The recorder adds the fields an update sets to the fixture name, so two updates of one order get separate files.
 
 ## Unverified items
 

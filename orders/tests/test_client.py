@@ -36,3 +36,10 @@ def test_log_message_parsing_finds_the_marker_and_the_id():
     assert record.find_event([message], "record request ", 42) == event
     assert record.find_event([message], "record request ", 7) is None
     assert record.parse_log_message("nothing here", "record request ") is None
+
+
+def test_output_name_carries_the_order_and_the_fields_an_update_sets():
+    assert record.output_name("carol", "list_orders", {}) == "live-carol-list_orders.json"
+    assert record.output_name("alice", "get_order", {"orderId": "order-2002"}) == "live-alice-get_order-order-2002.json"
+    assert (record.output_name("alice", "update_order", {"orderId": "order-1001", "changes": {"shippingAddress": "x"}})
+            == "live-alice-update_order-order-1001-shippingAddress.json")

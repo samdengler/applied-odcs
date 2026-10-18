@@ -2,9 +2,9 @@
 
 Ten minutes, terminal only.  `make demo` runs the whole sequence below against the deployed Gateway and prints each command with its output; the outputs here are pasted from that run on October 18, 2026.  Every command is short enough to type live.
 
-Two things in the plan's demo script changed once real output existed.  Dave reads nothing of an order (no permit gives finance a read, and the `refund-implies-no-read` guardrail proves it), so his refund comes back as an empty object.  And step 8's edit fails `make check` on two corpus cases, which stops `make deploy`; the step now shows the edit's effect with `dry-run` and shows the gate catching it.  Both are in `docs/status.md`.
+Two things in the plan's demo script changed once real output existed.  Dave reads nothing of an order (no permit gives finance a read, and the `refund-implies-no-read` guardrail proves it), so his refund comes back as an empty object.  And step 10's edit fails `make check` on two corpus cases, which stops `make deploy`; the step now shows the edit's effect with `dry-run` and shows the gate catching it.  Both are in `docs/status.md`.
 
-Order-1001 shows `status: refunded` in the live calls because Dave's refund ran earlier against the tool Lambda's in-memory data.  A cold start resets it.
+Order-1001 shows `status: refunded` in the live calls because Dave's refund ran earlier against the tool Lambda's in-memory data, and after step 8 its `shippingAddress` is `2 Elm St`.  A cold start resets both.
 
 ## 1. The contract names the fields
 
@@ -46,7 +46,7 @@ Point at `internalNotes: internal`, `fraudScore: restricted`, and the `writer` p
 
 ## 2. The pipeline gate, no AWS
 
-Build, validate, run-tests, then the handler tests on every event fixture, the six recorded live calls included.  This is the gate a pipeline runs.
+Build, validate, run-tests, then the handler tests on every event fixture, the eight recorded live calls included.  This is the gate a pipeline runs.
 
 ```
 $ make check
@@ -58,7 +58,7 @@ validate: ok
 run-tests: ok
 prove: skipped
 pull: skipped
-121 passed in 0.12s
+124 passed in 0.13s
 ```
 
 ## 3. Alice lists orders
@@ -195,7 +195,45 @@ Returned   [
            ]
 ```
 
-## 8. A classification change, and the gate catching it
+## 8. Alice updates her order
+
+The request interceptor checks every field in `changes` against the writer tags in the contract.  `shippingAddress` is written by its owner, so Alice's change reaches the API, and the order comes back with her seven fields.  `internalNotes` is written by support, so the second call is a 403 naming the field, and the API never sees it.
+
+```
+$ make -s call USER=alice TOOL=update_order ARGS='{"orderId":"order-1001","changes":{"shippingAddress":"2 Elm St"}}'
+alice  update_order  200  1 object
+{
+  "id": "order-1001",
+  "owner": "alice",
+  "status": "refunded",
+  "total": 120.0,
+  "shippingAddress": "2 Elm St",
+  "cardLast4": "4242",
+  "estimatedDelivery": "2026-09-20"
+}
+
+$ make -s call USER=alice TOOL=update_order ARGS='{"orderId":"order-1001","changes":{"internalNotes":"please call"}}'
+alice  update_order  403  error
+UpdateOrder rejected; fields not permitted: internalNotes
+```
+
+## 9. Carol acting for Alice updates the order
+
+Acting for Alice, Carol writes what Alice writes.  The address change is forwarded.  The support note is refused, though Carol writes `internalNotes` on her own (step 11): her support grant does not apply while she acts for a customer.  Like step 7, this runs from the command line on the hand-written identity.
+
+```
+$ uv run cedar-odcs dry-run orders --caller orders/tests/identities/carol-for-alice.json --tool orders___update_order --arg orderId=order-1001 --arg 'changes={"shippingAddress":"2 Elm St"}'
+Identity   User::"carol", employee-for-customer, acting for alice
+Tool       orders___update_order  {"orderId": "order-1001", "changes": {"shippingAddress": "2 Elm St"}}
+Request    forwarded: the verb round passed and the payload round passed
+
+$ uv run cedar-odcs dry-run orders --caller orders/tests/identities/carol-for-alice.json --tool orders___update_order --arg orderId=order-1001 --arg 'changes={"internalNotes":"called back"}'
+Identity   User::"carol", employee-for-customer, acting for alice
+Tool       orders___update_order  {"orderId": "order-1001", "changes": {"internalNotes": "called back"}}
+Request    rejected: UpdateOrder rejected; fields not permitted: internalNotes
+```
+
+## 10. A classification change, and the gate catching it
 
 Change `cardLast4` from `confidential` to `internal`.  `make demo` does it on a copy under `build/demo/` so the repository stays clean; live, edit `orders/contract/order.odcs.yaml` and revert after.
 
@@ -239,7 +277,7 @@ run-tests: failed
 
 To show the deployed effect, update the two cases (`field-reads.json`: "owner reads cardLast4 of own order" to Deny with no reason, "support agent may not read cardLast4" to Allow with `support-fields-on-any-order`), then `make deploy` (about a minute) and step 3 again.  Or show the dry-run output above and move on.
 
-## 9. What Carol may do
+## 11. What Carol may do
 
 Every verb, every readable field, every writable field, from real authorization questions.
 
@@ -258,7 +296,7 @@ Writable        internalNotes (support)
 Not writable    id (system), owner (system), status (system), total (system), shippingAddress (owner), cardLast4 (system), fraudScore (system), estimatedDelivery (system)
 ```
 
-## 10. One case in Cedar's playground
+## 12. One case in Cedar's playground
 
 Opens the case in Cedar's playground for anyone who wants to pull on it.
 
@@ -271,7 +309,7 @@ https://www.cedarpolicy.com/en/playground#data:H4sIALg01GoC/9VZW2/jthL+K6we2iwge
 
 ## If the Gateway is down
 
-Steps 3 to 6 run as `dry-run` against the recorded responses, and `make check` already replays the six live recordings in `orders/tests/events/live-*.json`:
+Steps 3 to 6 and 8 run as `dry-run` against the recorded responses, and `make check` already replays the eight live recordings in `orders/tests/events/live-*.json`:
 
 ```
 uv run cedar-odcs dry-run orders --caller orders/tests/identities/alice.json --tool orders___list_orders --response orders/tests/lists/orders.json
