@@ -47,7 +47,8 @@
       "Bash(git push --force:*)",
       "Bash(rm -rf /:*)",
       "Bash(rm -rf ~:*)",
-      "Read(./.env.applied-odcs)"
+      "Read(./.env.applied-odcs)",
+      "Read(./.env.applied-odcs-runtime)"
     ]
   }
 }

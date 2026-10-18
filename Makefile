@@ -3,14 +3,22 @@
 #   make check                       the pipeline gate, no AWS
 #   make deploy && make users        the stack, then Alice, Carol, Dave
 #   make call USER=carol TOOL=list_orders ARGS='{}'
+#
+# VARIANT selects the stack.  Empty is AppliedOdcs, which this branch never
+# deploys; VARIANT=runtime is AppliedOdcsRuntime, with its own env file.
 
 SHELL := /bin/bash
 TOOL ?= list_orders
 ARGS ?= {}
 CEDAR_ODCS_CHECKOUT ?= ../cedar-odcs
-ENV := .env.applied-odcs
+VARIANT ?=
+# scripts/demo.sh runs make again with ENV_FILE set to this.
+ENV := $(or $(ENV_FILE),.env.applied-odcs$(if $(VARIANT),-$(VARIANT)))
+STACK := $(if $(filter runtime,$(VARIANT)),AppliedOdcsRuntime,AppliedOdcs)
+OUTPUTS := build/outputs$(if $(VARIANT),-$(VARIANT)).json
+CDK := npx cdk -c variant=$(VARIANT)
 
-.PHONY: sync build check prove bundle synth deploy users token call record demo
+.PHONY: sync build check prove bundle synth compare-baseline deploy deploy-guard users token call record demo
 
 sync:
 	uv sync
@@ -36,14 +44,26 @@ bundle:
 	uv run python lambda/smoke.py
 
 synth: bundle
-	cd infra && npx cdk synth --quiet
-	uv run python scripts/check_synth.py
+	cd infra && $(CDK) synth --quiet
+	uv run python scripts/check_synth.py infra/cdk.out/$(STACK).template.json
+
+# The default variant must synthesize what the demo-lambda-target tag
+# did.  build/baseline-AppliedOdcs.template.json is make synth's output
+# at the tag, saved before the variant switch went in.
+compare-baseline:
+	cd infra && npx cdk -c variant= synth --quiet AppliedOdcs
+	uv run python scripts/compare_templates.py build/baseline-AppliedOdcs.template.json infra/cdk.out/AppliedOdcs.template.json
 
 # check is the gate: a contract or policy change that breaks the corpus
-# does not deploy.  The outputs go to .env.applied-odcs for the clients.
-deploy: check bundle
-	cd infra && npm ci --silent && npx cdk deploy --require-approval never --outputs-file ../build/outputs.json
-	uv run python scripts/env.py build/outputs.json
+# does not deploy.  The outputs go to $(ENV) for the clients.  On the
+# runtime-mcp branch only VARIANT=runtime deploys.
+deploy: deploy-guard check bundle
+	cd infra && npm ci --silent && $(CDK) deploy $(STACK) --require-approval never --outputs-file ../$(OUTPUTS)
+	uv run python scripts/env.py $(OUTPUTS) $(ENV)
+
+deploy-guard:
+	@if [ "$(VARIANT)" != runtime ]; then \
+	  echo "make deploy: this branch deploys only AppliedOdcsRuntime; run make deploy VARIANT=runtime" >&2; exit 1; fi
 
 users:
 	uv run --env-file $(ENV) python scripts/users.py
@@ -59,4 +79,4 @@ record:
 
 # docs/demo.md end to end, against the deployed Gateway.
 demo:
-	scripts/demo.sh
+	ENV_FILE=$(ENV) scripts/demo.sh

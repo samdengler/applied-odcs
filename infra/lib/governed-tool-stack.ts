@@ -12,13 +12,25 @@ import { Construct } from 'constructs';
 
 const REPO = path.join(__dirname, '..', '..');
 
+// '' is AppliedOdcs with a Lambda function target; 'runtime' is
+// AppliedOdcsRuntime, every physical name prefixed applied-odcs-runtime.
+export type Variant = '' | 'runtime';
+
+export interface GovernedToolStackProps extends cdk.StackProps {
+  readonly variant?: Variant;
+}
+
 export class GovernedToolStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props: GovernedToolStackProps = {}) {
     super(scope, id, props);
+    const variant = props.variant ?? '';
+    // Every physical name derives from this.  Log groups and functions are
+    // named by CloudFormation.
+    const prefix = variant ? `applied-odcs-${variant}` : 'applied-odcs';
 
     // Users and Client: Ping replaces both; Client is PingConfiguration.allowedClients.
     const users = new cognito.UserPool(this, 'Users', {
-      userPoolName: 'applied-odcs',
+      userPoolName: prefix,
       selfSignUpEnabled: false,
       signInAliases: { username: true },
       standardAttributes: { email: { required: true, mutable: true } },
@@ -77,7 +89,7 @@ export class GovernedToolStack extends cdk.Stack {
 
     // DeltaAgentCoreGateway.
     const gateway = new agentcore.Gateway(this, 'Gateway', {
-      gatewayName: 'applied-odcs',
+      gatewayName: prefix,
       protocolConfiguration: new agentcore.McpProtocolConfiguration({
         instructions: 'Orders tools.  Every call is decided by cedar-odcs from the orders ODCS contract and Cedar policies.',
         supportedVersions: [agentcore.MCPProtocolVersion.MCP_2025_06_18, agentcore.MCPProtocolVersion.MCP_2025_03_26],

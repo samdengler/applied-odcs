@@ -5,6 +5,10 @@
 set -u
 cd "$(dirname "$0")/.."
 
+# make demo passes the variant's env file as ENV_FILE; the make calls
+# below read it from the environment.
+export ENV_FILE=${ENV_FILE:-.env.applied-odcs}
+
 step() { printf '\n== %s\n$ %s\n' "$1" "$2"; eval "$2"; }
 
 step "1. The contract names the fields" \

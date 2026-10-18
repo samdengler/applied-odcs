@@ -15,6 +15,15 @@ questions doc linked at the top of `docs/plan.md`.
   own `CLAUDE.md` (Beads for its task tracking: `bd` an issue per change,
   close it when done).  This repo does not use Beads.
 
+## The runtime-mcp worktree
+
+- This worktree is the `runtime-mcp` branch, the port of the orders tool to
+  an MCP server on AgentCore Runtime.  The plan is `docs/plan-runtime.md`.
+- It deploys only `AppliedOdcsRuntime`, only with `VARIANT=runtime` on every
+  make target that touches AWS.  `make deploy` with no variant fails.
+- Defaults, fallbacks, and findings go in `docs/status-runtime.md`, not
+  `docs/status.md`.  The secrets live in `.env.applied-odcs-runtime`.
+
 ## Conventions
 
 - Prose (README, docs, commit messages, comments): two spaces after a

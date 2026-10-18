@@ -17,5 +17,6 @@ __pycache__/
 .pytest_cache/
 
 # local secrets and outputs
-.env.applied-odcs
+.env.applied-odcs*
+!.env.applied-odcs.example
 .env
