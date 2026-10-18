@@ -18,7 +18,7 @@ STACK := $(if $(filter runtime,$(VARIANT)),AppliedOdcsRuntime,AppliedOdcs)
 OUTPUTS := build/outputs$(if $(VARIANT),-$(VARIANT)).json
 CDK := npx cdk -c variant=$(VARIANT)
 
-.PHONY: sync build check prove bundle server-build server-smoke synth baseline compare-baseline deploy deploy-guard users token call tools record demo
+.PHONY: sync build check prove bundle server-build server-smoke synth baseline compare-baseline deploy deploy-guard users token call tools record compare-live demo
 
 sync:
 	uv sync
@@ -101,6 +101,10 @@ tools:
 # Recordings from the runtime variant go to orders/tests/events/runtime.
 record:
 	RECORD_DIR=orders/tests/events$(if $(VARIANT),/$(VARIANT)) uv run --env-file $(ENV) python -P client/record.py $(USER) $(TOOL) '$(ARGS)'
+
+# Each runtime recording against its Lambda function target recording.
+compare-live:
+	uv run python scripts/compare_live.py
 
 # docs/demo.md end to end, against the deployed Gateway.
 demo:

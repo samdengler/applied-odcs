@@ -9,7 +9,7 @@ The run of `docs/plan-runtime.md` on branch `runtime-mcp`, in the worktree at `~
 | 1. Variant switch and baseline | done | see `git log` |
 | 2. Orders MCP server | done | see `git log` |
 | 3. Runtime, M2M client, and MCP server target | done, after step 5 | see `git log` |
-| 4. Live calls and comparison | | |
+| 4. Live calls and comparison | done on v0.2.5: eight of eight outcomes match | see `git log` |
 | 5. cedar-odcs fix | done: v0.2.5, run before step 4 | cedar-odcs `63bdc08`, tag `v0.2.5` |
 | 6. Demo, writes, and latency | | |
 | 7. Close | | |
@@ -68,6 +68,12 @@ cedar-odcs v0.2.4 `_result_payload` reads `structuredContent` when present, so t
 - This branch's `pyproject.toml` pins `v0.2.5` and `uv.lock` follows.  The main checkout's `pyproject.toml` still pins `v0.2.4` (read, not changed).
 - `make deploy VARIANT=runtime` (21 seconds, interceptors only) with `build/lambda/cedar_odcs-0.2.5.dist-info`.  Then `make call VARIANT=runtime USER=carol TOOL=list_orders`: `200  5 rows`, `order-1001` to `order-5005`, each with the six fields `estimatedDelivery`, `id`, `internalNotes`, `owner`, `status`, `total`.  The Runtime log has its `CallToolRequest`.  Step 3's checks pass.
 
+### Step 4
+
+- `make record VARIANT=runtime` for the eight calls, in the order of the plan, into `orders/tests/events/runtime/`.  Every file has the bearer signature replaced with `signature-redacted` and `X-Forwarded-For` replaced with `203.0.113.10`.
+- `make compare-live` (`scripts/compare_live.py`) pairs each with the Lambda function target recording of the same name: 8 of 8 outcomes match.  The table is under Live comparison.
+- `make check` replays both sets through the local handlers on v0.2.5 (`test_live_recording_matches_the_local_handlers`, 16 cases) and passes (136 tests).
+
 ## Defaults taken
 
 | Step | Default | Why |
@@ -89,6 +95,7 @@ cedar-odcs v0.2.4 `_result_payload` reads `structuredContent` when present, so t
 | 3 | The Runtime authorizer is `RuntimeAuthorizerConfiguration.usingCognito(users, [m2mClient])`, which renders `AllowedClients` with the M2M client and no audience or scope check. | Cognito client credentials tokens carry `client_id` and no `aud`. |
 | 3 | Two outputs beyond the plan's: `M2MClientId` and `TokenEndpoint`.  `scripts/env.py` reads the client secret from Cognito with `DescribeUserPoolClient` and writes it to `.env.applied-odcs-runtime` as `M2M_CLIENT_SECRET`, never printing it. | The plan puts the M2M secret in the env file; these let a script fetch an M2M token to call the Runtime directly while debugging. |
 | 3 | `make tools USER=<user>` runs `client/tools.py`, a `tools/list` through the Gateway.  `client/call.py` gains `session(user)`, the initialize half of `call`, which both use. | The step's check is a `tools/list` as Carol, and every verification is a target. |
+| 4 | `compare_live.py` reads each payload with `client/call.py`'s `payload_of`, so a wrapped list compares as its rows.  Field values are not compared, only ids and field names, as the plan says.  An `error` compares by its message as well as by status. | Values differ by the order of writes across the two stacks' histories. |
 | 5 | `client/call.py`'s `payload_of` unwraps a `structuredContent` of `{"result": [list]}` too, so `make call` prints `5 rows` and the rows.  A test in `test_client.py` covers it. | The interceptor now leaves the list wrapped, as FastMCP sent it, and the client printed `1 object`. |
 | 5 | `client/record.py` writes into `RECORD_DIR`, which `make record` sets to `orders/tests/events/runtime` for the runtime variant.  After a 403 it waits up to 20 seconds for a response event before saving `response: null`. | A 403 from the response interceptor (a withheld result) has a response event worth keeping; one from the request interceptor has none. |
 | 3 | The resource server identifier is `orders` and the scope is `orders/invoke`. | The plan names the resource server `orders` with one scope. |
@@ -119,7 +126,25 @@ cedar-odcs v0.2.4 `_result_payload` reads `structuredContent` when present, so t
 
 ## Live comparison
 
-Step 4 fills this in: each of the eight runtime recordings against its Lambda function target recording.
+`make compare-live`, each runtime recording (`orders/tests/events/runtime/`, MCP server target, cedar-odcs v0.2.5) against the Lambda function target recording of the same name (`orders/tests/events/`, v0.2.4 era):
+
+| Call | Lambda function target | Runtime | Same |
+| --- | --- | --- | --- |
+| Alice `get_order` order-2002 | 403 `ReadOrder is not permitted for this caller` | 403, same message | yes |
+| Alice `list_orders` | 200, order-1001 and order-3003, seven fields each | 200, same ids and fields | yes |
+| Alice `refund_order` order-1001 | 403 `RefundOrder is not permitted for this caller` | 403, same message | yes |
+| Alice `update_order` order-1001 `internalNotes` | 403 `UpdateOrder rejected; fields not permitted: internalNotes` | 403, same message | yes |
+| Alice `update_order` order-1001 `shippingAddress` | 200, order-1001 with seven fields | 200, same | yes |
+| Carol `list_orders` | 200, five orders, six fields each | 200, same ids and fields | yes |
+| Dave `list_orders` | 200, no rows | 200, no rows | yes |
+| Dave `refund_order` order-1001 | 200, an empty object | 200, an empty object | yes |
+
+Envelope findings, printed by `compare_live.py` and not failing it:
+
+- Every result from the MCP server target carries `structuredContent` (from the target, and still at the caller after the response interceptor); the Lambda function target's results carry none.  For a list it is `{"result": [...]}`.
+- From the target, a list arrives as one text item per row (five for the full list); the Lambda function target sends one text item holding the list.  The response interceptor writes one text item either way.
+- The request event and the response event have the same key paths in both, apart from `structuredContent` inside the result.  `isStreamingResponse` is `false` in every runtime response event.
+- The three request-denied calls (Alice `get_order`, `refund_order`, the `internalNotes` update) have a response event in the runtime recordings and none in the Lambda function target recordings.  The difference is the recorder: before step 5, `client/record.py` did not look for a response event after a 403.  The runtime events show the Gateway runs the response interceptor on the request interceptor's short-circuit, with the JSON-RPC error as the body, and v0.2.5 passes it through.  Whether the Lambda function target stack does the same is checked in step 6.
 
 ## Secrets
 

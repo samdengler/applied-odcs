@@ -227,7 +227,10 @@ def _payload(body: dict | None):
     return None
 
 
-@pytest.mark.parametrize("path", sorted((HERE / "events").glob("live-*.json")), ids=lambda p: p.stem)
+# The Lambda function target's recordings in events/, the runtime
+# variant's (an MCP server target) in events/runtime/.
+@pytest.mark.parametrize("path", sorted((HERE / "events").glob("live-*.json")) + sorted((HERE / "events/runtime").glob("live-*.json")),
+                         ids=lambda p: p.relative_to(HERE / "events").with_suffix("").as_posix())
 def test_live_recording_matches_the_local_handlers(path):
     fixture = json.loads(path.read_text())
     observed = fixture["observed"]
