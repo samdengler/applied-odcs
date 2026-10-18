@@ -39,5 +39,23 @@ synth: bundle
 	cd infra && npx cdk synth --quiet
 	uv run python scripts/check_synth.py
 
-deploy users token call record demo:
-	@echo "make $@: not built yet (see docs/plan.md, Work order)"; exit 1
+# check is the gate: a contract or policy change that breaks the corpus
+# does not deploy.  The outputs go to .env.applied-odcs for the clients.
+deploy: check bundle
+	cd infra && npm ci --silent && npx cdk deploy --require-approval never --outputs-file ../build/outputs.json
+	uv run python scripts/env.py build/outputs.json
+
+users:
+	uv run --env-file $(ENV) python scripts/users.py
+
+token:
+	uv run --env-file $(ENV) python -P client/token.py $(USER)
+
+call:
+	@uv run --env-file $(ENV) python -P client/call.py $(USER) $(TOOL) '$(ARGS)'
+
+record:
+	uv run --env-file $(ENV) python -P client/record.py $(USER) $(TOOL) '$(ARGS)'
+
+demo:
+	@echo "make demo: not built yet (see docs/plan.md, Work order step 9)"; exit 1

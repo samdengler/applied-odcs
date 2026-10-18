@@ -11,6 +11,7 @@ both the structured content and the text content.
 import json
 from pathlib import Path
 
+import pytest
 from cedar_odcs.gateway.handlers import handlers
 from orders.usecase import TOOLS, USE_CASE
 
@@ -214,3 +215,29 @@ def test_string_body_is_parsed_not_passed():
     out = request_handler(ev)
     assert out["mcp"]["transformedGatewayResponse"]["statusCode"] == 403
     assert "RefundOrder is not permitted" in out["mcp"]["transformedGatewayResponse"]["body"]["error"]["message"]
+
+
+def _payload(body: dict | None):
+    result = (body or {}).get("result") or {}
+    if "structuredContent" in result:
+        return result["structuredContent"]
+    for item in result.get("content") or []:
+        if item.get("type") == "text":
+            return json.loads(item["text"])
+    return None
+
+
+@pytest.mark.parametrize("path", sorted((HERE / "events").glob("live-*.json")), ids=lambda p: p.stem)
+def test_live_recording_matches_the_local_handlers(path):
+    fixture = json.loads(path.read_text())
+    observed = fixture["observed"]
+    out = request_handler(fixture["request"])["mcp"]
+    if observed["status"] == 403 or "error" in (observed["body"] or {}):
+        response = out["transformedGatewayResponse"]
+        assert response["statusCode"] == 403
+        assert response["body"]["error"]["message"] == observed["body"]["error"]["message"]
+        return
+    assert "transformedGatewayRequest" in out
+    if fixture["response"] is not None:
+        filtered = response_handler(fixture["response"])["mcp"]["transformedGatewayResponse"]["body"]
+        assert _payload(filtered) == _payload(observed["body"])
