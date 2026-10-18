@@ -43,3 +43,10 @@ def test_output_name_carries_the_order_and_the_fields_an_update_sets():
     assert record.output_name("alice", "get_order", {"orderId": "order-2002"}) == "live-alice-get_order-order-2002.json"
     assert (record.output_name("alice", "update_order", {"orderId": "order-1001", "changes": {"shippingAddress": "x"}})
             == "live-alice-update_order-order-1001-shippingAddress.json")
+
+
+def test_payload_of_unwraps_an_mcp_server_list():
+    rows = [{"id": "order-1001"}, {"id": "order-3003"}]
+    assert call.payload_of({"result": {"structuredContent": {"result": rows}, "content": []}}) == rows
+    assert call.payload_of({"result": {"structuredContent": {"id": "order-1001"}}}) == {"id": "order-1001"}
+    assert call.payload_of({"result": {"content": [{"type": "text", "text": json.dumps(rows)}]}}) == rows

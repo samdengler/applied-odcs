@@ -3,7 +3,8 @@
 Makes the call through call.call, then reads the two interceptors' logged
 events (the handlers log them when CEDAR_ODCS_RECORD=1) from CloudWatch Logs,
 picks the ones whose JSON-RPC id matches, redacts bearer token signatures, and
-writes orders/tests/events/live-<user>-<tool>[-<orderId>][-<field>...].json.
+writes live-<user>-<tool>[-<orderId>][-<field>...].json into RECORD_DIR,
+orders/tests/events by default.
 """
 
 import importlib.util
@@ -15,10 +16,14 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-EVENTS = ROOT / "orders" / "tests" / "events"
+EVENTS = ROOT / os.environ.get("RECORD_DIR", "orders/tests/events")
 BEARER = re.compile(r"(Bearer\s+[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+)\.[A-Za-z0-9_\-=]*")
 POLL_SECONDS = 60
 POLL_EVERY = 5
+# A 403 is the request interceptor's denial (no response event follows) or
+# the response interceptor's withheld result (one does); wait this long for
+# a response event after a 403.
+DENIED_POLL_SECONDS = 20
 
 
 def _load_call_module():
@@ -117,6 +122,7 @@ def main(argv: list[str]) -> int:
     logs = boto3.client("logs", region_name=os.environ.get("AWS_REGION", "us-east-1"))
     request_event = response_event = None
     deadline = time.time() + POLL_SECONDS
+    denied_deadline = None
     while True:
         if request_event is None:
             request_event = find_event(
@@ -124,13 +130,17 @@ def main(argv: list[str]) -> int:
                 "record request ",
                 rpc_id,
             )
-        if request_event is not None and response_event is None and not denied:
+            if request_event is not None and denied:
+                denied_deadline = time.time() + DENIED_POLL_SECONDS
+        if request_event is not None and response_event is None:
             response_event = find_event(
                 fetch_messages(logs, os.environ["RESPONSE_LOG_GROUP"], "record response ", start_ms),
                 "record response ",
                 rpc_id,
             )
-        if request_event is not None and (denied or response_event is not None):
+        if request_event is not None and response_event is not None:
+            break
+        if denied_deadline is not None and time.time() >= denied_deadline:
             break
         if time.time() >= deadline:
             break
@@ -150,6 +160,7 @@ def main(argv: list[str]) -> int:
         "response": redact(response_event) if response_event is not None else None,
         "observed": {"status": outcome["status"], "body": outcome["body"]},
     }
+    EVENTS.mkdir(parents=True, exist_ok=True)
     path = EVENTS / output_name(user, tool, arguments)
     path.write_text(json.dumps(fixture, indent=2) + "\n")
     print(path)

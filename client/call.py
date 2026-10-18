@@ -52,7 +52,8 @@ def _post(url: str, headers: dict, message: dict) -> tuple[int, dict, dict | Non
         return err.code, dict(err.headers), parse_body(err.read().decode())
 
 
-def call(user: str, tool: str, arguments: dict) -> dict:
+def session(user: str) -> dict:
+    """initialize and notifications/initialized as user; the headers for the next request."""
     token = _load_token_module().access_token(user)
     url = os.environ["GATEWAY_URL"]
     headers = {
@@ -75,6 +76,12 @@ def call(user: str, tool: str, arguments: dict) -> dict:
         if key.lower() == "mcp-session-id":
             headers["Mcp-Session-Id"] = value
     _post(url, headers, {"jsonrpc": "2.0", "method": "notifications/initialized"})
+    return headers
+
+
+def call(user: str, tool: str, arguments: dict) -> dict:
+    url = os.environ["GATEWAY_URL"]
+    headers = session(user)
     rpc_id = random.randint(10**8, 10**9 - 1)
     status, _, body = _post(
         url,
@@ -90,10 +97,14 @@ def call(user: str, tool: str, arguments: dict) -> dict:
 
 
 def payload_of(body: dict | None):
-    """The tool's payload: structuredContent if present, else the first text item parsed as JSON."""
+    """The tool's payload: structuredContent if present, else the first text item parsed as JSON.
+    An MCP server sends a list as {"result": [...]} in structuredContent; that is the list."""
     result = (body or {}).get("result") or {}
     if "structuredContent" in result:
-        return result["structuredContent"]
+        content = result["structuredContent"]
+        if isinstance(content, dict) and set(content) == {"result"} and isinstance(content["result"], list):
+            return content["result"]
+        return content
     for item in result.get("content") or []:
         if item.get("type") == "text":
             try:

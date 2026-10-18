@@ -4,8 +4,9 @@
 key is AppliedOdcs or AppliedOdcsRuntime; the env file is .env.applied-odcs
 or .env.applied-odcs-runtime, and is ignored by git.  It keeps
 APPLIED_ODCS_PASSWORD across deploys and generates one the first time,
-meeting the Cognito default policy (upper, lower, digit, symbol).  The
-password is never printed.
+meeting the Cognito default policy (upper, lower, digit, symbol).  For the
+runtime variant it also writes M2M_CLIENT_SECRET, read from Cognito.  Neither
+secret is ever printed.
 """
 
 import json
@@ -17,12 +18,21 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUTS = {"GatewayUrl": "GATEWAY_URL", "GatewayId": "GATEWAY_ID", "UserPoolId": "USER_POOL_ID",
            "ClientId": "CLIENT_ID", "Region": "AWS_REGION", "RequestLogGroup": "REQUEST_LOG_GROUP",
-           "ResponseLogGroup": "RESPONSE_LOG_GROUP", "ToolLogGroup": "TOOL_LOG_GROUP"}
+           "ResponseLogGroup": "RESPONSE_LOG_GROUP", "ToolLogGroup": "TOOL_LOG_GROUP",
+           "RuntimeArn": "RUNTIME_ARN", "RuntimeLogGroup": "RUNTIME_LOG_GROUP",
+           "M2MClientId": "M2M_CLIENT_ID", "TokenEndpoint": "TOKEN_ENDPOINT"}
 
 
 def _password() -> str:
     alphabet = string.ascii_letters + string.digits
     return "Aa1-" + "".join(secrets.choice(alphabet) for _ in range(20))
+
+
+def _client_secret(region: str, pool: str, client: str) -> str:
+    import boto3
+
+    idp = boto3.client("cognito-idp", region_name=region)
+    return idp.describe_user_pool_client(UserPoolId=pool, ClientId=client)["UserPoolClient"]["ClientSecret"]
 
 
 def main(outputs_file: str, env_file: str) -> None:
@@ -39,6 +49,8 @@ def main(outputs_file: str, env_file: str) -> None:
     for output, key in OUTPUTS.items():
         if output in stack:
             current[key] = stack[output]
+    if "M2MClientId" in stack:
+        current["M2M_CLIENT_SECRET"] = _client_secret(stack["Region"], stack["UserPoolId"], stack["M2MClientId"])
     # Create the file private before the password goes in.
     env.touch(mode=0o600)
     env.chmod(0o600)

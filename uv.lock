@@ -46,7 +46,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "cedar-odcs", git = "https://github.com/samdengler/cedar-odcs.git?rev=v0.2.4" }]
+requires-dist = [{ name = "cedar-odcs", git = "https://github.com/samdengler/cedar-odcs.git?rev=v0.2.5" }]
 
 [package.metadata.requires-dev]
 dev = [
@@ -94,8 +94,8 @@ wheels = [
 
 [[package]]
 name = "cedar-odcs"
-version = "0.2.4"
-source = { git = "https://github.com/samdengler/cedar-odcs.git?rev=v0.2.4#2b5ecad77e798ba98399ece2851d986d0637bca2" }
+version = "0.2.5"
+source = { git = "https://github.com/samdengler/cedar-odcs.git?rev=v0.2.5#63bdc08a9ba9b0f2904a4855c0a620a381bbbca4" }
 dependencies = [
     { name = "cedarpy" },
     { name = "open-data-contract-standard" },

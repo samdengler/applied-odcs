@@ -18,7 +18,7 @@ STACK := $(if $(filter runtime,$(VARIANT)),AppliedOdcsRuntime,AppliedOdcs)
 OUTPUTS := build/outputs$(if $(VARIANT),-$(VARIANT)).json
 CDK := npx cdk -c variant=$(VARIANT)
 
-.PHONY: sync build check prove bundle server-build server-smoke synth compare-baseline deploy deploy-guard users token call record demo
+.PHONY: sync build check prove bundle server-build server-smoke synth compare-baseline deploy deploy-guard users token call tools record demo
 
 sync:
 	uv sync
@@ -47,13 +47,13 @@ bundle:
 # file, so orders.json has one source.
 server-build:
 	rm -rf build/server && mkdir -p build/server
-	cp orders/server/server.py orders/server/requirements.txt orders/tool/data/orders.json build/server/
+	cp orders/server/server.py orders/server/requirements.txt orders/server/Dockerfile orders/tool/data/orders.json build/server/
 
 # The server from build/server on the Mac, initialize and tools/list over HTTP.
 server-smoke: server-build
 	uv run python scripts/server_smoke.py
 
-synth: bundle
+synth: bundle server-build
 	cd infra && $(CDK) synth --quiet
 	uv run python scripts/check_synth.py infra/cdk.out/$(STACK).template.json
 
@@ -67,7 +67,7 @@ compare-baseline:
 # check is the gate: a contract or policy change that breaks the corpus
 # does not deploy.  The outputs go to $(ENV) for the clients.  On the
 # runtime-mcp branch only VARIANT=runtime deploys.
-deploy: deploy-guard check bundle
+deploy: deploy-guard check bundle server-build
 	cd infra && npm ci --silent && $(CDK) deploy $(STACK) --require-approval never --outputs-file ../$(OUTPUTS)
 	uv run python scripts/env.py $(OUTPUTS) $(ENV)
 
@@ -84,8 +84,12 @@ token:
 call:
 	@uv run --env-file $(ENV) python -P client/call.py $(USER) $(TOOL) '$(ARGS)'
 
+tools:
+	@uv run --env-file $(ENV) python -P client/tools.py $(USER)
+
+# Recordings from the runtime variant go to orders/tests/events/runtime.
 record:
-	uv run --env-file $(ENV) python -P client/record.py $(USER) $(TOOL) '$(ARGS)'
+	RECORD_DIR=orders/tests/events$(if $(VARIANT),/$(VARIANT)) uv run --env-file $(ENV) python -P client/record.py $(USER) $(TOOL) '$(ARGS)'
 
 # docs/demo.md end to end, against the deployed Gateway.
 demo:
