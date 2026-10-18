@@ -11,7 +11,7 @@ The run of `docs/plan-runtime.md` on branch `runtime-mcp`, in the worktree at `~
 | 3. Runtime, M2M client, and MCP server target | done, after step 5 | see `git log` |
 | 4. Live calls and comparison | done on v0.2.5: eight of eight outcomes match | see `git log` |
 | 5. cedar-odcs fix | done: v0.2.5, run before step 4 | cedar-odcs `63bdc08`, tag `v0.2.5` |
-| 6. Demo, writes, and latency | | |
+| 6. Demo, writes, and latency | done | see `git log` |
 | 7. Close | | |
 
 ### Step 1
@@ -74,6 +74,33 @@ cedar-odcs v0.2.4 `_result_payload` reads `structuredContent` when present, so t
 - `make compare-live` (`scripts/compare_live.py`) pairs each with the Lambda function target recording of the same name: 8 of 8 outcomes match.  The table is under Live comparison.
 - `make check` replays both sets through the local handlers on v0.2.5 (`test_live_recording_matches_the_local_handlers`, 16 cases) and passes (136 tests).
 
+### Step 6
+
+`make demo VARIANT=runtime` ran end to end (output in `build/demo-runtime.txt`, not committed).  Every line of `docs/demo.md`'s output blocks appears in it except these:
+
+| Demo step | `docs/demo.md` | Runtime stack | Why |
+| --- | --- | --- | --- |
+| 2 | `124 passed` | `136 passed` | The branch adds the server, client, and runtime replay tests. |
+| 3, 4, 8 | order-1001 `"status": "refunded"` | `"status": "shipped"` | Dave's refund in step 6 (and earlier) did not persist to the next call (K7).  On the Lambda function target a warm container kept it. |
+| 12 | the playground link | a different link | The link is a gzip of the case, and it changes between runs on either stack. |
+
+The decisions are the same in every step: the same rows, the same fields, the same 403 messages, Dave's empty object.
+
+Writes (K7): three rounds of Alice `update_order` order-1001 with `shippingAddress` `1 Birch Ave`, `2 Birch Ave`, `3 Birch Ave`, each followed by Alice `get_order` order-1001.  Every update returned the new address in its own call; every `get_order` returned the original `1 Oak Ln`.  Each Runtime log stream (`/aws/bedrock-agentcore/runtimes/applied_odcs_runtime_orders-T2FW6DHYSp-DEFAULT`, streams named `<date>/[runtime-logs]<uuid>`) begins with `Started server process [1]` and `Uvicorn running on http://0.0.0.0:8000`, then holds one call's `initialize`, `notifications/initialized` (202), and `CallToolRequest`, plus the Runtime's pings.  So the Gateway opens a new Runtime session, with a fresh server process and fresh memory, for every tool call.  Recorded, not fixed, as the plan says.
+
+Latency: `make latency` (`client/latency.py`), Carol `list_orders`, one sign-in and one `initialize`, two warmup calls, then ten timed `tools/call` round trips, from this Mac.  Two rounds per stack:
+
+| Stack | Round | Times (ms) | Median | Worst |
+| --- | --- | --- | --- | --- |
+| `AppliedOdcsRuntime` (MCP server target) | 1 | 1553 1609 1645 1572 1535 1639 1536 1536 4519 6496 | 1591 | 6496 |
+| `AppliedOdcsRuntime` | 2 | 1536 1638 1642 1566 1503 1537 1624 1630 1455 6383 | 1595 | 6383 |
+| `AppliedOdcs` (Lambda function target) | 1 | 389 429 409 409 387 364 376 411 378 439 | 399 | 439 |
+| `AppliedOdcs` | 2 | 385 338 433 286 415 303 358 377 409 340 | 368 | 433 |
+
+The runtime stack is about four times slower at the median, and has six-second outliers.  A new Runtime session per call (above) is the likely cause: each call starts a server process.  Calling the main stack used `../applied-odcs/.env.applied-odcs` through `uv run --env-file`, unprinted; nothing was deployed to it.
+
+The main stack's Gateway also runs the response interceptor after a request denial: Alice `get_order` order-2002 against `AppliedOdcs` returned 403, and its response log group has one `record response` event for that call's id.  The step 4 envelope difference for the three denied calls is the recorder's alone.
+
 ## Defaults taken
 
 | Step | Default | Why |
@@ -95,6 +122,7 @@ cedar-odcs v0.2.4 `_result_payload` reads `structuredContent` when present, so t
 | 3 | The Runtime authorizer is `RuntimeAuthorizerConfiguration.usingCognito(users, [m2mClient])`, which renders `AllowedClients` with the M2M client and no audience or scope check. | Cognito client credentials tokens carry `client_id` and no `aud`. |
 | 3 | Two outputs beyond the plan's: `M2MClientId` and `TokenEndpoint`.  `scripts/env.py` reads the client secret from Cognito with `DescribeUserPoolClient` and writes it to `.env.applied-odcs-runtime` as `M2M_CLIENT_SECRET`, never printing it. | The plan puts the M2M secret in the env file; these let a script fetch an M2M token to call the Runtime directly while debugging. |
 | 3 | `make tools USER=<user>` runs `client/tools.py`, a `tools/list` through the Gateway.  `client/call.py` gains `session(user)`, the initialize half of `call`, which both use. | The step's check is a `tools/list` as Carol, and every verification is a target. |
+| 6 | `make latency` times only the `tools/call` POST after one sign-in and one `initialize`, with two warmup calls, and ran two rounds per stack. | The plan asks for warm calls; sign-in and initialize are the same for both stacks. |
 | 4 | `compare_live.py` reads each payload with `client/call.py`'s `payload_of`, so a wrapped list compares as its rows.  Field values are not compared, only ids and field names, as the plan says.  An `error` compares by its message as well as by status. | Values differ by the order of writes across the two stacks' histories. |
 | 5 | `client/call.py`'s `payload_of` unwraps a `structuredContent` of `{"result": [list]}` too, so `make call` prints `5 rows` and the rows.  A test in `test_client.py` covers it. | The interceptor now leaves the list wrapped, as FastMCP sent it, and the client printed `1 object`. |
 | 5 | `client/record.py` writes into `RECORD_DIR`, which `make record` sets to `orders/tests/events/runtime` for the runtime variant.  After a 403 it waits up to 20 seconds for a response event before saving `response: null`. | A 403 from the response interceptor (a withheld result) has a response event worth keeping; one from the request interceptor has none. |
@@ -115,8 +143,8 @@ cedar-odcs v0.2.4 `_result_payload` reads `structuredContent` when present, so t
 | K3 | Docker is installed (`/opt/homebrew/bin/docker`) and the daemon answers `docker info`; Finch is not installed.  Default taken: a container image from `build/server/`. |
 | K4 | The envelope matches the Lambda function target's: the same keys at every level, a parsed `body`, `isStreamingResponse: false`, empty response headers.  The result inside differs (`structuredContent` present and wrapped for a list, one text item per row).  Not streamed. |
 | K5 | OAuth works.  The Gateway reaches the Runtime with client credentials from the Cognito M2M client, through the `CognitoOauth2` credential provider, both for the target's tool synchronization and for each `tools/call`.  The `usingCustom` fallback was not needed.  The Gateway also offers IAM outbound to an MCP server target in this version, `GatewayCredentialProvider.fromIamRole({service, region})`, which the README says the service accepts only for MCP server and OpenAPI targets.  Noted; the stack stays on OAuth to match Delta. |
-| K6 | |
-| K7 | |
+| K6 | Not exercised: the server did not change after the target was created.  The target synchronized on creation (`lastSynchronizedAt` 22:19:44 UTC), and the second deploy, which changed only the interceptors, did not touch it.  The control-plane call exists (`SynchronizeGatewayTargets`, which the aws-bedrockagentcore README names and `GatewayTarget.grantSync` grants) but was not run. |
+| K7 | Writes do not survive.  Each tool call lands in a new Runtime session with a fresh server process (step 6). |
 
 ## Findings
 
@@ -144,7 +172,7 @@ Envelope findings, printed by `compare_live.py` and not failing it:
 - Every result from the MCP server target carries `structuredContent` (from the target, and still at the caller after the response interceptor); the Lambda function target's results carry none.  For a list it is `{"result": [...]}`.
 - From the target, a list arrives as one text item per row (five for the full list); the Lambda function target sends one text item holding the list.  The response interceptor writes one text item either way.
 - The request event and the response event have the same key paths in both, apart from `structuredContent` inside the result.  `isStreamingResponse` is `false` in every runtime response event.
-- The three request-denied calls (Alice `get_order`, `refund_order`, the `internalNotes` update) have a response event in the runtime recordings and none in the Lambda function target recordings.  The difference is the recorder: before step 5, `client/record.py` did not look for a response event after a 403.  The runtime events show the Gateway runs the response interceptor on the request interceptor's short-circuit, with the JSON-RPC error as the body, and v0.2.5 passes it through.  Whether the Lambda function target stack does the same is checked in step 6.
+- The three request-denied calls (Alice `get_order`, `refund_order`, the `internalNotes` update) have a response event in the runtime recordings and none in the Lambda function target recordings.  The difference is the recorder: before step 5, `client/record.py` did not look for a response event after a 403.  The runtime events show the Gateway runs the response interceptor on the request interceptor's short-circuit, with the JSON-RPC error as the body, and v0.2.5 passes it through.  The Lambda function target stack does the same (step 6), so this difference is the recorder's alone.
 
 ## Secrets
 

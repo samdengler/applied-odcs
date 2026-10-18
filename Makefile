@@ -18,7 +18,7 @@ STACK := $(if $(filter runtime,$(VARIANT)),AppliedOdcsRuntime,AppliedOdcs)
 OUTPUTS := build/outputs$(if $(VARIANT),-$(VARIANT)).json
 CDK := npx cdk -c variant=$(VARIANT)
 
-.PHONY: sync build check prove bundle server-build server-smoke synth baseline compare-baseline deploy deploy-guard users token call tools record compare-live demo
+.PHONY: sync build check prove bundle server-build server-smoke synth baseline compare-baseline deploy deploy-guard users token call tools record compare-live latency demo
 
 sync:
 	uv sync
@@ -101,6 +101,11 @@ tools:
 # Recordings from the runtime variant go to orders/tests/events/runtime.
 record:
 	RECORD_DIR=orders/tests/events$(if $(VARIANT),/$(VARIANT)) uv run --env-file $(ENV) python -P client/record.py $(USER) $(TOOL) '$(ARGS)'
+
+# Ten timed tools/call round trips after two warmups; ENV_FILE picks the
+# other stack's env file to time it from here.
+latency:
+	@uv run --env-file $(ENV) python -P client/latency.py $(USER) $(TOOL) 10 2
 
 # Each runtime recording against its Lambda function target recording.
 compare-live:
