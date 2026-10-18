@@ -28,5 +28,12 @@ check:
 prove: build
 	CEDAR_ODCS_ANALYSIS=$(CEDAR_ODCS_CHECKOUT)/analysis uv run cedar-odcs prove orders
 
-bundle synth deploy users token call record demo:
+# build/lambda for both interceptors; the smoke test runs the bundle's
+# handler on one fixture with the Mac's cedarpy standing in for the
+# Linux wheel.
+bundle:
+	lambda/bundle.sh
+	uv run python lambda/smoke.py
+
+synth deploy users token call record demo:
 	@echo "make $@: not built yet (see docs/plan.md, Work order)"; exit 1
