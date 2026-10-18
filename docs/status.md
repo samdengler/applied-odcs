@@ -38,6 +38,19 @@ Teardown, not run: `cd infra && npx cdk destroy AppliedOdcs`.  The user pool and
 - Step 8: the six live calls below, recorded; `make check` passes with them (121 tests).
 - Step 9: `make demo` runs `docs/demo.md` end to end against the Gateway.
 - Step 10: cedar-odcs v0.2.3 renders `grants.yaml` to the field policies; its test shows the rendered text equals the four hand-written orders policies.  The sample carries `orders/contract/grants.yaml` and its `policies.cedar` no longer has P4, P5, P6, P11 (nine policies kept).  `make check` passes with the corpus unchanged (75 cases), `make prove` gives the same 25 proved and 12 non-vacuous guardrails as the hand-written orders, and after `make deploy` the three list calls return what step 8 recorded (Alice two rows with seven fields, Carol five rows with six, Dave none).  The 03:00 fallback was not needed.
+- Step 11: cedar-odcs v0.2.4 adds `cedar-odcs tools DIR` and runs it in `check` after build when `tools.json` is beside `usecase.py`.  With the sample's `tools.json` it prints `every outputSchema in tools.json names the contract's leaves`.  With `cardLast4` dropped from `list_orders`'s output schema, `make check` stopped at the gate:
+
+  ```
+  == tools ==
+  orders___list_orders: outputSchema and the contract differ
+    in outputSchema, not in the contract: (none)
+    in the contract, not in outputSchema: cardLast4
+
+  build: ok
+  tools: failed
+  ```
+
+  `tools.json` was restored from a copy (`git diff` empty) and `make check` passed again.
 
 ## Defaults taken
 
@@ -54,6 +67,7 @@ Teardown, not run: `cd infra && npx cdk destroy AppliedOdcs`.  The user pool and
 - **Each live fixture holds both events and what the client saw.**  `live-<user>-<tool>[-<orderId>].json` carries the request event, the response event (null when the request leg refused), and the observed status and JSON-RPC body.  `test_live_recording_matches_the_local_handlers` in `test_interceptor.py` runs the local handlers on the recorded events and asserts they decide what the live Gateway returned.
 
 - **Grants reach the prover.**  The plan's step 10 lists build, `UseCase.policies`, `validate`, and `share`.  The corpus runner, `run-tests`, and the Rust `prove` read `policies.cedar` by path too; all of them now append `contract/generated/grants.cedar`, so the guardrails are proved against the same text the engine decides with.  `build` takes the descriptor's field verbs and defaults to `Read<Entity>Field` and `Update<Entity>Field`.
+- **The gate checks every object and list tool.**  The plan says "for every tool whose `returns` is `object` or `list`"; all five orders tools qualify.  A governed tool with no entry or no `outputSchema` in `tools.json` fails too, with every leaf listed as missing.  Paths are spelled as the field round spells them (`a.b`, `a[].b`), and a list tool's top-level array is the paths of its items.
 - **Demo step 8 changed.**  The plan's step 8 edits the contract and runs `make check` then `make deploy`.  The edit fails two corpus cases ("owner reads cardLast4 of own order", "support agent may not read cardLast4"), so `make check` fails and `make deploy` stops.  `docs/demo.md` shows the edit's effect with `dry-run` and the gate catching it, and says which two cases to update (checked: with them updated the corpus passes) for anyone who wants to deploy the change live.  `make demo` does the edit on a copy under `build/demo/`.
 
 ## Findings against the plan
