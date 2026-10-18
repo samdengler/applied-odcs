@@ -1,0 +1,250 @@
+[
+  {
+    "name": "get_order",
+    "description": "Return one order by id.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "orderId": {
+          "type": "string",
+          "description": "The order id, for example order-1001."
+        }
+      },
+      "required": [
+        "orderId"
+      ]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "total": {
+          "type": "number"
+        },
+        "shippingAddress": {
+          "type": "string"
+        },
+        "cardLast4": {
+          "type": "string"
+        },
+        "internalNotes": {
+          "type": "string"
+        },
+        "fraudScore": {
+          "type": "number"
+        },
+        "estimatedDelivery": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  {
+    "name": "update_order",
+    "description": "Change the writable fields of one order and return it.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "orderId": {
+          "type": "string",
+          "description": "The order id."
+        },
+        "changes": {
+          "type": "object",
+          "description": "Fields to change.",
+          "properties": {
+            "shippingAddress": {
+              "type": "string"
+            },
+            "internalNotes": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": [
+        "orderId",
+        "changes"
+      ]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "total": {
+          "type": "number"
+        },
+        "shippingAddress": {
+          "type": "string"
+        },
+        "cardLast4": {
+          "type": "string"
+        },
+        "internalNotes": {
+          "type": "string"
+        },
+        "fraudScore": {
+          "type": "number"
+        },
+        "estimatedDelivery": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  {
+    "name": "cancel_order",
+    "description": "Cancel one order and return it.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "orderId": {
+          "type": "string",
+          "description": "The order id, for example order-1001."
+        }
+      },
+      "required": [
+        "orderId"
+      ]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "total": {
+          "type": "number"
+        },
+        "shippingAddress": {
+          "type": "string"
+        },
+        "cardLast4": {
+          "type": "string"
+        },
+        "internalNotes": {
+          "type": "string"
+        },
+        "fraudScore": {
+          "type": "number"
+        },
+        "estimatedDelivery": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  {
+    "name": "refund_order",
+    "description": "Refund one order and return it.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "orderId": {
+          "type": "string",
+          "description": "The order id, for example order-1001."
+        }
+      },
+      "required": [
+        "orderId"
+      ]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "total": {
+          "type": "number"
+        },
+        "shippingAddress": {
+          "type": "string"
+        },
+        "cardLast4": {
+          "type": "string"
+        },
+        "internalNotes": {
+          "type": "string"
+        },
+        "fraudScore": {
+          "type": "number"
+        },
+        "estimatedDelivery": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  {
+    "name": "list_orders",
+    "description": "Return every order.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {}
+    },
+    "outputSchema": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "total": {
+            "type": "number"
+          },
+          "shippingAddress": {
+            "type": "string"
+          },
+          "cardLast4": {
+            "type": "string"
+          },
+          "internalNotes": {
+            "type": "string"
+          },
+          "fraudScore": {
+            "type": "number"
+          },
+          "estimatedDelivery": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+]
