@@ -23,7 +23,7 @@ The run of `docs/plan-runtime.md` on branch `runtime-mcp`, in the worktree at `~
 
 ## What is deployed
 
-Stack `AppliedOdcsRuntime` in account 009080466601 (the default profile's SSO account), us-east-1, plain aws-cdk-lib 2.273.0, interceptors on cedar-odcs v0.2.5.  `AppliedOdcs` is unchanged and still deployed from the main checkout; this session deployed nothing to it.
+Stack `AppliedOdcsRuntime` in account 009080466601 (the default profile's SSO account), us-east-1, plain aws-cdk-lib 2.273.0, interceptors on cedar-odcs v0.2.5, Runtime on platform V2.  `AppliedOdcs` is unchanged and still deployed from the main checkout; this session deployed nothing to it.
 
 | Output | Value |
 | --- | --- |
@@ -121,9 +121,30 @@ Latency: `make latency` (`client/latency.py`), Carol `list_orders`, one sign-in 
 | `AppliedOdcs` (Lambda function target) | 1 | 389 429 409 409 387 364 376 411 378 439 | 399 | 439 |
 | `AppliedOdcs` | 2 | 385 338 433 286 415 303 358 377 409 340 | 368 | 433 |
 
-The runtime stack is about four times slower at the median, and has six-second outliers.  A new Runtime session per call (above) is the likely cause: each call starts a server process.  Calling the main stack used `../applied-odcs/.env.applied-odcs` through `uv run --env-file`, unprinted; nothing was deployed to it.
+The runtime stack is about four times slower at the median, and has six-second outliers.  These rounds ran on Runtime platform V1, the service default, since the stack set no `platformVersion` (a default not recorded at the time).  Platform V2 is compared below.  Calling the main stack used `../applied-odcs/.env.applied-odcs` through `uv run --env-file`, unprinted; nothing was deployed to it.
 
 The main stack's Gateway also runs the response interceptor after a request denial: Alice `get_order` order-2002 against `AppliedOdcs` returned 403, and its response log group has one `record response` event for that call's id.  The step 4 envelope difference for the three denied calls is the recorder's alone.
+
+### Runtime platform V2 (after step 7)
+
+Asked after the close: whether the Runtime was on platform V2.  It was not: `get-agent-runtime` reported `platformVersion: V1`.  The stack now sets `platformVersion: agentcore.PlatformVersion.V2`.  `cdk diff` showed an in-place update of the Runtime, and `make deploy VARIANT=runtime` (205 seconds) left the ARN, and so the target's endpoint, unchanged; `get-agent-runtime` reports `V2`, `READY`, version 2, and the target stays `READY` without a resynchronization.
+
+The eight calls, made live on V2 and compared with the recorded outcomes (not re-recorded, so `orders/tests/events/runtime/` stays the V1 recording): all eight the same.  A write still does not survive to the next call (`9 Birch Ave`, then `1 Oak Ln`).
+
+`make latency`, interleaved with the main stack so both see the same network:
+
+| Stack | Round | Median | Worst | Times (ms) |
+| --- | --- | --- | --- | --- |
+| Runtime V2 | 1 | 3148 | 3372 | 2976 3372 2969 2914 3230 2915 3266 3118 3294 3177 |
+| Lambda function target | 1 | 410 | 474 | 474 410 410 353 465 410 411 410 361 457 |
+| Runtime V2 | 2 | 2827 | 3883 | 2783 2720 2938 3883 3072 2867 2682 3361 2764 2787 |
+| Lambda function target | 2 | 409 | 453 | 453 410 409 409 351 348 428 344 371 411 |
+
+V2 is slower than V1 at the median (about 3.0 s against 1.6 s) and steadier (no six-second outliers; worst 3.9 s against 6.5 s).
+
+Where the time goes, from the Runtime log streams.  On both platforms each tool call is one Runtime session, and inside it the Gateway sends three requests about 300 ms apart (`initialize`, then `notifications/initialized`, then `tools/call`), about 620 ms from the first to the tool's answer.  On V1 the server process in the session had started 24 seconds before the call arrived (a pre-warmed process), so process start is not on the call's path; the step 6 note that each call starts a server process was right about fresh memory and wrong as the cause of the latency.  The rest of the round trip, about 1 s on V1 and 2.4 s on V2, is outside what the server logs: the Gateway's interceptors (about 0.4 s in total on the main stack), the OAuth token, and the Runtime assigning a session before the first request reaches the server.  V2's extra time is in that last part or the token, not in the server.  V2 also names log streams `runtime-logs-<uuid>` where V1 used `<date>/[runtime-logs]<uuid>`.
+
+Both platforms probe `GET /ping` about 2 s after a call and get a 404 from FastMCP, then fall back to MCP `ping` requests every 2 s for the life of the session.
 
 ## Defaults taken
 
@@ -204,7 +225,7 @@ The runtime stack's demo password and the M2M client secret are in `.env.applied
 
 ## Open questions for the bundle loader plan
 
-- **A Runtime session per tool call.**  The Gateway opens a new Runtime session for every `tools/call`, with a fresh server process.  That costs about 1.2 s per call against the Lambda function target, with six-second outliers, and makes in-memory state useless, so production gap 0.1 (records in a deployed store) is required, not optional.  Open: whether the Gateway can be made to reuse a Runtime session (a session header, or the target's configuration), and whether `lifecycleConfiguration` or a lighter image shortens the start.
+- **A Runtime session per tool call.**  The Gateway opens a new Runtime session for every `tools/call`, with its own server process and memory, and sends three sequential requests into it.  That costs about 1.2 s per call against the Lambda function target on platform V1 and about 2.5 s on V2, and makes in-memory state useless, so production gap 0.1 (records in a deployed store) is required, not optional.  Open: whether the Gateway can reuse a Runtime session or skip the per-call `initialize`, which platform Delta's Runtimes use, and why V2 is slower here when its description promises fast starts.
 - **Output schemas the Gateway serves.**  An MCP server target's tool schemas come from the server's `tools/list`, so callers see FastMCP's schemas (`additionalProperties: true` objects, and `{"result": array}` for the list), not `orders/tools.json`.  The cedar-odcs tool schema gate still checks `tools.json`.  The bundle could have the server declare the contract's output schema (typed return models generated from the contract), or the gate could read the server's `tools/list`.
 - **The `{"result": [...]}` wrapping.**  v0.2.5 unwraps it for a list tool.  A server that returns a list some other way (no structured output, text items only) would still be withheld, since only the first text item is read.  The bundle should fix the server's result shape, and cedar-odcs should have a test per supported shape.
 - **mcp 2.x.**  The server is on mcp 1.30.0 because 2.x renamed FastMCP to `MCPServer`.  The bundle should pick one, and the Runtime examples it follows.

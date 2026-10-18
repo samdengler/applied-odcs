@@ -166,6 +166,9 @@ export class GovernedToolStack extends cdk.Stack {
         platform: ecrAssets.Platform.LINUX_ARM64,
       }),
       protocolConfiguration: agentcore.ProtocolType.MCP,
+      // V2 starts sessions faster, and the Gateway opens a new Runtime
+      // session for every tool call.  Unset, the service default is V1.
+      platformVersion: agentcore.PlatformVersion.V2,
       authorizerConfiguration: agentcore.RuntimeAuthorizerConfiguration.usingCognito(users, [m2mClient]),
     });
 
