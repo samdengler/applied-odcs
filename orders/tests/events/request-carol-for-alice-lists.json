@@ -1,0 +1,27 @@
+{
+  "interceptorInputVersion": "1.0",
+  "mcp": {
+    "rawGatewayRequest": {
+      "body": "{\"jsonrpc\": \"2.0\", \"id\": 9, \"method\": \"tools/call\", \"params\": {\"name\": \"orders___list_orders\", \"arguments\": {}}}"
+    },
+    "gatewayRequest": {
+      "path": "/mcp",
+      "httpMethod": "POST",
+      "headers": {
+        "Accept": "application/json",
+        "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImV4YW1wbGUifQ.ewogICJzdWIiOiAiN2MxZjBiNTItM2E0ZS00ZDhhLTliNjEtMmU1ZDhmM2ExYzA0IiwKICAiaXNzIjogImh0dHBzOi8vY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb20vdXMtZWFzdC0xX0VYQU1QTEUiLAogICJjbGllbnRfaWQiOiAiM244ZXg0bXBsM2MxaWVudGlkN3EyazlhNWIiLAogICJvcmlnaW5fanRpIjogIjFkNGY3YTkwLTZiMmMtNGU4NS05YzEzLWE4ZTBmNWI3MmQ0NiIsCiAgImV2ZW50X2lkIjogIjVhOWMyZTcxLTgzZjQtNGIwZC1iNmUyLTdkMWY0YThjM2U5NSIsCiAgImp0aSI6ICJjMDZiM2Q1OC0xZTk3LTRhMmYtOGQ0MC1iNWYyZTdhOTFjNjMiLAogICJ0b2tlbl91c2UiOiAiYWNjZXNzIiwKICAic2NvcGUiOiAiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLAogICJhdXRoX3RpbWUiOiAxNzYwMDAwMDAwLAogICJpYXQiOiAxNzYwMDAwMDAwLAogICJleHAiOiAxNzYwMDAzNjAwLAogICJhY3QiOiB7CiAgICAic3ViIjogImI4M2Q2ZTE5LTUyYzctNGYwYS04ZTNiLTkxYTdjNGQyMGY2NSIsCiAgICAidXNlcm5hbWUiOiAiY2Fyb2wiLAogICAgImNvZ25pdG86Z3JvdXBzIjogWwogICAgICAic3VwcG9ydCIKICAgIF0KICB9LAogICJ1c2VybmFtZSI6ICJhbGljZSIKfQ.signature-checked-by-the-gateway",
+        "Mcp-Session-Id": "session-1",
+        "User-Agent": "agent/1.0"
+      },
+      "body": {
+        "jsonrpc": "2.0",
+        "id": 9,
+        "method": "tools/call",
+        "params": {
+          "name": "orders___list_orders",
+          "arguments": {}
+        }
+      }
+    }
+  }
+}

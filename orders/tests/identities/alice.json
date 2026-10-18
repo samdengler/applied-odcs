@@ -1,0 +1,14 @@
+{
+  "sub": "7c1f0b52-3a4e-4d8a-9b61-2e5d8f3a1c04",
+  "iss": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_EXAMPLE",
+  "client_id": "3n8ex4mpl3c1ientid7q2k9a5b",
+  "origin_jti": "1d4f7a90-6b2c-4e85-9c13-a8e0f5b72d46",
+  "event_id": "5a9c2e71-83f4-4b0d-b6e2-7d1f4a8c3e95",
+  "jti": "c06b3d58-1e97-4a2f-8d40-b5f2e7a91c63",
+  "token_use": "access",
+  "scope": "aws.cognito.signin.user.admin",
+  "auth_time": 1760000000,
+  "iat": 1760000000,
+  "exp": 1760003600,
+  "username": "alice"
+}

@@ -6,7 +6,7 @@ version = "0.1.0"
 description = "One governed MCP tool behind an AgentCore Gateway, with cedar-odcs deciding every call"
 requires-python = ">=3.12"
 dependencies = [
-    "cedar-odcs @ git+https://github.com/samdengler/cedar-odcs.git@v0.2.0",
+    "cedar-odcs @ git+https://github.com/samdengler/cedar-odcs.git@v0.2.1",
 ]
 
 [dependency-groups]
