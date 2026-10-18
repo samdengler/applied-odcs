@@ -24,6 +24,11 @@
 //
 // Policy ids stay positional (policy0, policy1, ...); the corpora
 // refer to them.
+//
+// The four field policies, P4, P5, P6, and P11, are not here: cedar-odcs
+// build renders them from contract/grants.yaml into
+// contract/generated/grants.cedar, and every reader of the policies
+// takes the two together.
 
 // P1 (policy0): A customer may read an order they own; an employee
 // acting for the customer holds the same.
@@ -60,48 +65,10 @@ permit(
 // P4 (policy3): A customer may read public and confidential fields of
 // an order they own; an employee acting for the customer holds the
 // same.
-@id("customer-fields-on-own-order")
-permit(
-  principal,
-  action == Action::"ReadOrderField",
-  resource
-) when {
-  resource has owner &&
-  resource.owner == (if context has actingFor then context.actingFor else principal) &&
-  context has field &&
-  Contract::"Order".hasTag(context.field) &&
-  ["public", "confidential"].contains(Contract::"Order".getTag(context.field))
-};
-
 // P5 (policy4): A support agent may read public and internal fields
 // of any order, in direct mode.
-@id("support-fields-on-any-order")
-permit(
-  principal in Role::"support",
-  action == Action::"ReadOrderField",
-  resource
-) when {
-  !(context has actingFor) &&
-  context has field &&
-  Contract::"Order".hasTag(context.field) &&
-  ["public", "internal"].contains(Contract::"Order".getTag(context.field))
-};
-
 // P6 (policy5): A customer may update owner-writable fields of an
 // order they own; an employee acting for the customer holds the same.
-@id("customer-updates-own-order-fields")
-permit(
-  principal,
-  action == Action::"UpdateOrderField",
-  resource
-) when {
-  resource has owner &&
-  resource.owner == (if context has actingFor then context.actingFor else principal) &&
-  context has field &&
-  Contract::"Order/writers".hasTag(context.field) &&
-  Contract::"Order/writers".getTag(context.field) == "owner"
-};
-
 // P7 (policy6): A customer may cancel an order they own; an employee
 // acting for the customer holds the same.
 @id("customer-cancels-own-order")
@@ -148,18 +115,6 @@ permit(
 
 // P11 (policy10): A support agent may set the fields whose writer is
 // "support", on any order, in direct mode.
-@id("support-updates-support-fields")
-permit(
-  principal in Role::"support",
-  action == Action::"UpdateOrderField",
-  resource
-) when {
-  !(context has actingFor) &&
-  context has field &&
-  Contract::"Order/writers".hasTag(context.field) &&
-  Contract::"Order/writers".getTag(context.field) == "support"
-};
-
 // G1 (policy11): Only an employee may act for another party. A
 // customer token carrying an actor claim, or an unknown principal
 // claiming to act for a customer, matches this forbid and nothing

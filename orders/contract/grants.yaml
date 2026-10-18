@@ -1,0 +1,10 @@
+# The field-level grants, keyed on classification.  cedar-odcs build
+# renders them to contract/generated/grants.cedar: P4, P5, P6, and P11 of
+# the hand-written orders policies.  The verb policies stay in
+# policies.cedar.
+reads:
+  owner:   [public, confidential]     # the acted-for party or the principal
+  support: [public, internal]
+writes:
+  owner:   owner                       # writer tag a party may set
+  support: support
