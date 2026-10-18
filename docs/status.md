@@ -4,11 +4,24 @@ The run of `docs/plan.md`, Work order steps 1 to 12, on October 17 and 18, 2026.
 
 ## Commits and tags
 
-(Filled in at step 12.)
+cedar-odcs, on `main`, pushed to github.com/samdengler/cedar-odcs, each tag after `./check.sh` was green:
+
+| Commit | Tag | Change |
+| --- | --- | --- |
+| `01cab76` | | Claims mapping on the descriptor (step 1) |
+| `95534dc` | `v0.2.0` | `CEDAR_ODCS_RECORD` switch |
+| `c607d9f` | `v0.2.1` | `check --skip pull --skip prove`, `CEDAR_ODCS_ANALYSIS` |
+| `d08b0c4` | `v0.2.2` | Interceptor responses carry only `statusCode`, `headers`, `body` (the live Gateway fix) |
+| `b132bf8` | `v0.2.3` | Role grants rendered to policies (step 10) |
+| `2b5ecad` | `v0.2.4` | Tool schema gate (step 11) |
+
+Each change has a closed Beads issue in cedar-odcs.
+
+applied-odcs, on `main`, pushed to the new private repository github.com/samdengler/applied-odcs: thirteen commits, `b84dd30` (skeleton) to the closing commit, one or more per Work order step.  The sample pins cedar-odcs `v0.2.4`, and the deployed stack was built from that tag.
 
 ## What is deployed
 
-Stack `AppliedOdcs` in account 009080466601 (the default profile's SSO account), us-east-1, from plain aws-cdk-lib 2.273.0 and aws-cdk 2.1145.0.  The account was already bootstrapped (`CDKToolkit`, bootstrap version 32).
+Stack `AppliedOdcs` in account 009080466601 (the default profile's SSO account), us-east-1, from plain aws-cdk-lib 2.273.0 and aws-cdk 2.1145.0.  Last deployed at step 12 from the final commit: interceptors on cedar-odcs v0.2.4, field policies from `grants.yaml`, `CEDAR_ODCS_RECORD` on.  The account was already bootstrapped (`CDKToolkit`, bootstrap version 32).
 
 | Output | Value |
 | --- | --- |
@@ -28,7 +41,7 @@ Teardown, not run: `cd infra && npx cdk destroy AppliedOdcs`.  The user pool and
 
 ## What passed
 
-- Step 1: cedar-odcs `./check.sh` green at v0.2.0, v0.2.1, and v0.2.2 (724 tests at v0.2.2, every use case's check, 211 history proofs).
+- Step 1: cedar-odcs `./check.sh` green before every tag, v0.2.0 to v0.2.4 (731 tests at v0.2.4, every use case's check, 211 history proofs).
 - Step 2: `uv run cedar-odcs --help` from the sample.
 - Step 3: the copied corpus, 75 cases, unchanged; the interceptor tests on every regenerated event; the carol-for-alice `dry-run` prints order-1001 and order-3003 with seven fields each.
 - Step 4: `test_tool.py`, `list_orders` returns five rows with all nine fields.
@@ -51,6 +64,7 @@ Teardown, not run: `cd infra && npx cdk destroy AppliedOdcs`.  The user pool and
   ```
 
   `tools.json` was restored from a copy (`git diff` empty) and `make check` passed again.
+- Step 12: at the closing commits, `make check` (121 tests, every step ok, pull and prove skipped by design) and `make synth` pass here, `./check.sh` passes in cedar-odcs (731 tests, 25 orders proofs, 211 history proofs), the stack was redeployed from the final commit and answers (`alice list_orders` 2 rows, `carol list_orders` 5 rows, `alice refund_order` 403), and `git status` is clean in both repositories.  `make prove` passed at step 10.  `cdk destroy` was not run.
 
 ## Defaults taken
 
