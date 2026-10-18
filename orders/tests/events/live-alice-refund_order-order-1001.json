@@ -1,0 +1,63 @@
+{
+  "user": "alice",
+  "tool": "refund_order",
+  "arguments": {
+    "orderId": "order-1001"
+  },
+  "request": {
+    "interceptorInputVersion": "1.0",
+    "mcp": {
+      "gatewayRequest": {
+        "path": "/mcp",
+        "httpMethod": "POST",
+        "headers": {
+          "x-amzn-tls-version": "TLSv1.3",
+          "x-amzn-vpce-config": "",
+          "Accept": "application/json, text/event-stream",
+          "X-Forwarded-Proto": "https",
+          "User-Agent": "Python-urllib/3.12",
+          "Host": "applied-odcs-qfff07owsu.gateway.bedrock-agentcore.us-east-1.amazonaws.com",
+          "x-amzn-vpc-id": "",
+          "Accept-Encoding": "identity",
+          "x-amzn-vpce-policy-url": "",
+          "X-Forwarded-Port": "443",
+          "X-Amzn-Trace-Id": "Root=1-6ad4344a-4f76c041679bab4d631cd9c2",
+          "Authorization": "Bearer eyJraWQiOiJ2VFpqNVV0dGw5ZmFCYUFDVjdSODR5cXAzdWh6eDY1OG1LbXY3aUUrUklnPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJlNGY4ZTQzOC0yMDgxLTcwMTctNzNlMS0yNTk2MzEwMTU1ZDUiLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV90ODlsanByRE0iLCJjbGllbnRfaWQiOiIydGJidDRnaWFqdmttYjNiZzJtaG1jb204OSIsIm9yaWdpbl9qdGkiOiJhYTI2ZmIwOC0xMTIwLTQ5YzYtYjlhMy0yODgyMTkzNmYwY2EiLCJldmVudF9pZCI6ImM0OGU3ODM0LTIzMmEtNGJlNS05NzY4LTY1ODk1MzY2NWZhMCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTIyOTE5MTMsImV4cCI6MTc5MjI5NTUxMywiaWF0IjoxNzkyMjkxOTEzLCJqdGkiOiJjMDUwY2Q2Mi1iMmQ4LTQyNTYtOTk1My0zMWI3NWYzOTE2YWQiLCJ1c2VybmFtZSI6ImFsaWNlIn0.signature-redacted",
+          "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
+          "X-Forwarded-For": "203.0.113.10",
+          "Content-Length": "144",
+          "x-amzn-vpce-id": "",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": 527275245,
+          "jsonrpc": "2.0",
+          "method": "tools/call",
+          "params": {
+            "name": "orders___refund_order",
+            "arguments": {
+              "orderId": "order-1001"
+            }
+          }
+        },
+        "context": null
+      },
+      "gatewayResponse": null,
+      "rawGatewayRequest": {
+        "body": "{\"jsonrpc\": \"2.0\", \"id\": 527275245, \"method\": \"tools/call\", \"params\": {\"name\": \"orders___refund_order\", \"arguments\": {\"orderId\": \"order-1001\"}}}"
+      }
+    }
+  },
+  "response": null,
+  "observed": {
+    "status": 403,
+    "body": {
+      "jsonrpc": "2.0",
+      "id": 527275245,
+      "error": {
+        "code": -32000,
+        "message": "RefundOrder is not permitted for this caller"
+      }
+    }
+  }
+}

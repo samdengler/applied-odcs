@@ -2,10 +2,11 @@
 # Builds build/lambda, the code both interceptor Lambdas run: cedar_odcs
 # and its dependencies as Linux arm64 wheels for Python 3.12, plus orders/
 # with the files the build generates from the contract.  No Docker.  The
-# cedar-odcs pin is the one in pyproject.toml.
+# cedar-odcs pin is the one in pyproject.toml; CEDAR_ODCS_SOURCE overrides it
+# (a local checkout path, while iterating on a fix before it is tagged).
 set -e
 cd "$(dirname "$0")/.."
-PIN=$(grep -o '"cedar-odcs @ [^"]*"' pyproject.toml | tr -d '"')
+PIN=${CEDAR_ODCS_SOURCE:-$(grep -o '"cedar-odcs @ [^"]*"' pyproject.toml | tr -d '"')}
 
 rm -rf build/lambda && mkdir -p build/lambda
 uv pip install --quiet --target build/lambda \

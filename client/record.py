@@ -28,14 +28,21 @@ def _load_call_module():
     return module
 
 
+# Headers that name the caller's network rather than the call: the
+# caller's public address is replaced with a documentation address.
+ADDRESS_HEADERS = {"x-forwarded-for": "203.0.113.10"}
+
+
 def redact(value):
-    """Replace the signature of every bearer token found anywhere in value."""
+    """Replace the signature of every bearer token found anywhere in value,
+    and the caller's address in X-Forwarded-For."""
     if isinstance(value, str):
         return BEARER.sub(r"\1.signature-redacted", value)
     if isinstance(value, list):
         return [redact(v) for v in value]
     if isinstance(value, dict):
-        return {k: redact(v) for k, v in value.items()}
+        return {k: ADDRESS_HEADERS.get(k.lower(), redact(v)) if isinstance(v, str) else redact(v)
+                for k, v in value.items()}
     return value
 
 

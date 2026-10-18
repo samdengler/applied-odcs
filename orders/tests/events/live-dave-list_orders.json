@@ -1,0 +1,124 @@
+{
+  "user": "dave",
+  "tool": "list_orders",
+  "arguments": {},
+  "request": {
+    "interceptorInputVersion": "1.0",
+    "mcp": {
+      "gatewayRequest": {
+        "path": "/mcp",
+        "httpMethod": "POST",
+        "headers": {
+          "x-amzn-tls-version": "TLSv1.3",
+          "x-amzn-vpce-config": "",
+          "Accept": "application/json, text/event-stream",
+          "X-Forwarded-Proto": "https",
+          "User-Agent": "Python-urllib/3.12",
+          "Host": "applied-odcs-qfff07owsu.gateway.bedrock-agentcore.us-east-1.amazonaws.com",
+          "x-amzn-vpc-id": "",
+          "Accept-Encoding": "identity",
+          "x-amzn-vpce-policy-url": "",
+          "X-Forwarded-Port": "443",
+          "X-Amzn-Trace-Id": "Root=1-6ad4341c-0a7c620057edef16094ba321",
+          "Authorization": "Bearer eyJraWQiOiJ2VFpqNVV0dGw5ZmFCYUFDVjdSODR5cXAzdWh6eDY1OG1LbXY3aUUrUklnPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIzNGM4MjQ0OC1iMDMxLTcwNjUtZTgwMC05MmYwZWE2ODNhNmIiLCJjb2duaXRvOmdyb3VwcyI6WyJmaW5hbmNlIiwiZW1wbG95ZWUiXSwiaXNzIjoiaHR0cHM6Ly9jb2duaXRvLWlkcC51cy1lYXN0LTEuYW1hem9uYXdzLmNvbS91cy1lYXN0LTFfdDg5bGpwckRNIiwiY2xpZW50X2lkIjoiMnRiYnQ0Z2lhanZrbWIzYmcybWhtY29tODkiLCJvcmlnaW5fanRpIjoiZGQ4ODM4OGUtNTg0Ny00Njg5LTk2YWEtOTk5M2I5MzBjNDlmIiwiZXZlbnRfaWQiOiI2NjllMzAxZC1lMWNiLTRkOWEtYWI2Zi1lM2E0NWU1ZGIyZjUiLCJ0b2tlbl91c2UiOiJhY2Nlc3MiLCJzY29wZSI6ImF3cy5jb2duaXRvLnNpZ25pbi51c2VyLmFkbWluIiwiYXV0aF90aW1lIjoxNzkyMjkxODY3LCJleHAiOjE3OTIyOTU0NjcsImlhdCI6MTc5MjI5MTg2NywianRpIjoiNWJmODRhMjItMjIzMi00Y2NhLTljZGQtMTBjYWQ1OWJlYzgwIiwidXNlcm5hbWUiOiJkYXZlIn0.signature-redacted",
+          "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
+          "X-Forwarded-For": "203.0.113.10",
+          "Content-Length": "120",
+          "x-amzn-vpce-id": "",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": 445043757,
+          "jsonrpc": "2.0",
+          "method": "tools/call",
+          "params": {
+            "name": "orders___list_orders",
+            "arguments": {}
+          }
+        },
+        "context": null
+      },
+      "gatewayResponse": null,
+      "rawGatewayRequest": {
+        "body": "{\"jsonrpc\": \"2.0\", \"id\": 445043757, \"method\": \"tools/call\", \"params\": {\"name\": \"orders___list_orders\", \"arguments\": {}}}"
+      }
+    }
+  },
+  "response": {
+    "interceptorInputVersion": "1.0",
+    "mcp": {
+      "gatewayRequest": {
+        "path": "/mcp",
+        "httpMethod": "POST",
+        "headers": {
+          "x-amzn-tls-version": "TLSv1.3",
+          "x-amzn-vpce-config": "",
+          "Accept": "application/json, text/event-stream",
+          "User-Agent": "Python-urllib/3.12",
+          "X-Forwarded-Proto": "https",
+          "Host": "applied-odcs-qfff07owsu.gateway.bedrock-agentcore.us-east-1.amazonaws.com",
+          "x-amzn-vpc-id": "",
+          "Accept-Encoding": "identity",
+          "x-amzn-vpce-policy-url": "",
+          "X-Forwarded-Port": "443",
+          "X-Amzn-Trace-Id": "Root=1-6ad4341c-0a7c620057edef16094ba321",
+          "Authorization": "Bearer eyJraWQiOiJ2VFpqNVV0dGw5ZmFCYUFDVjdSODR5cXAzdWh6eDY1OG1LbXY3aUUrUklnPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIzNGM4MjQ0OC1iMDMxLTcwNjUtZTgwMC05MmYwZWE2ODNhNmIiLCJjb2duaXRvOmdyb3VwcyI6WyJmaW5hbmNlIiwiZW1wbG95ZWUiXSwiaXNzIjoiaHR0cHM6Ly9jb2duaXRvLWlkcC51cy1lYXN0LTEuYW1hem9uYXdzLmNvbS91cy1lYXN0LTFfdDg5bGpwckRNIiwiY2xpZW50X2lkIjoiMnRiYnQ0Z2lhanZrbWIzYmcybWhtY29tODkiLCJvcmlnaW5fanRpIjoiZGQ4ODM4OGUtNTg0Ny00Njg5LTk2YWEtOTk5M2I5MzBjNDlmIiwiZXZlbnRfaWQiOiI2NjllMzAxZC1lMWNiLTRkOWEtYWI2Zi1lM2E0NWU1ZGIyZjUiLCJ0b2tlbl91c2UiOiJhY2Nlc3MiLCJzY29wZSI6ImF3cy5jb2duaXRvLnNpZ25pbi51c2VyLmFkbWluIiwiYXV0aF90aW1lIjoxNzkyMjkxODY3LCJleHAiOjE3OTIyOTU0NjcsImlhdCI6MTc5MjI5MTg2NywianRpIjoiNWJmODRhMjItMjIzMi00Y2NhLTljZGQtMTBjYWQ1OWJlYzgwIiwidXNlcm5hbWUiOiJkYXZlIn0.signature-redacted",
+          "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
+          "X-Forwarded-For": "203.0.113.10",
+          "Content-Length": "120",
+          "x-amzn-vpce-id": "",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": 445043757,
+          "jsonrpc": "2.0",
+          "method": "tools/call",
+          "params": {
+            "name": "orders___list_orders",
+            "arguments": {}
+          }
+        },
+        "context": null
+      },
+      "gatewayResponse": {
+        "path": "/mcp",
+        "httpMethod": "POST",
+        "headers": {},
+        "body": {
+          "jsonrpc": "2.0",
+          "id": 445043757,
+          "result": {
+            "isError": false,
+            "content": [
+              {
+                "type": "text",
+                "text": "[{\"id\":\"order-1001\",\"owner\":\"alice\",\"status\":\"shipped\",\"total\":120.0,\"shippingAddress\":\"1 Oak Ln\",\"cardLast4\":\"4242\",\"internalNotes\":\"called back\",\"fraudScore\":0.02,\"estimatedDelivery\":\"2026-09-20\"},{\"id\":\"order-2002\",\"owner\":\"bob\",\"status\":\"processing\",\"total\":45.5,\"shippingAddress\":\"9 Elm St\",\"cardLast4\":\"1111\",\"internalNotes\":\"\",\"fraudScore\":0.4,\"estimatedDelivery\":\"2026-09-22\"},{\"id\":\"order-3003\",\"owner\":\"alice\",\"status\":\"processing\",\"total\":8.0,\"shippingAddress\":\"1 Oak Ln\",\"cardLast4\":\"4242\",\"internalNotes\":\"gift\",\"fraudScore\":0.01,\"estimatedDelivery\":\"2026-09-25\"},{\"id\":\"order-4004\",\"owner\":\"bob\",\"status\":\"shipped\",\"total\":230.0,\"shippingAddress\":\"9 Elm St\",\"cardLast4\":\"1111\",\"internalNotes\":\"signature required\",\"fraudScore\":0.07,\"estimatedDelivery\":\"2026-09-28\"},{\"id\":\"order-5005\",\"owner\":\"bob\",\"status\":\"processing\",\"total\":19.99,\"shippingAddress\":\"22 Pine Rd\",\"cardLast4\":\"1111\",\"internalNotes\":\"\",\"fraudScore\":0.15,\"estimatedDelivery\":\"2026-10-02\"}]"
+              }
+            ]
+          }
+        },
+        "statusCode": 200,
+        "isStreamingResponse": false
+      },
+      "rawGatewayRequest": {
+        "body": "{\"jsonrpc\": \"2.0\", \"id\": 445043757, \"method\": \"tools/call\", \"params\": {\"name\": \"orders___list_orders\", \"arguments\": {}}}"
+      }
+    }
+  },
+  "observed": {
+    "status": 200,
+    "body": {
+      "jsonrpc": "2.0",
+      "id": 445043757,
+      "result": {
+        "isError": false,
+        "content": [
+          {
+            "type": "text",
+            "text": "[]"
+          }
+        ]
+      }
+    }
+  }
+}

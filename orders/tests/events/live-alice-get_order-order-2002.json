@@ -1,0 +1,63 @@
+{
+  "user": "alice",
+  "tool": "get_order",
+  "arguments": {
+    "orderId": "order-2002"
+  },
+  "request": {
+    "interceptorInputVersion": "1.0",
+    "mcp": {
+      "gatewayRequest": {
+        "path": "/mcp",
+        "httpMethod": "POST",
+        "headers": {
+          "x-amzn-tls-version": "TLSv1.3",
+          "x-amzn-vpce-config": "",
+          "Accept": "application/json, text/event-stream",
+          "X-Forwarded-Proto": "https",
+          "User-Agent": "Python-urllib/3.12",
+          "Host": "applied-odcs-qfff07owsu.gateway.bedrock-agentcore.us-east-1.amazonaws.com",
+          "x-amzn-vpc-id": "",
+          "Accept-Encoding": "identity",
+          "x-amzn-vpce-policy-url": "",
+          "X-Forwarded-Port": "443",
+          "X-Amzn-Trace-Id": "Root=1-6ad4342c-0565857b40af2b947a44543b",
+          "Authorization": "Bearer eyJraWQiOiJ2VFpqNVV0dGw5ZmFCYUFDVjdSODR5cXAzdWh6eDY1OG1LbXY3aUUrUklnPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJlNGY4ZTQzOC0yMDgxLTcwMTctNzNlMS0yNTk2MzEwMTU1ZDUiLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV90ODlsanByRE0iLCJjbGllbnRfaWQiOiIydGJidDRnaWFqdmttYjNiZzJtaG1jb204OSIsIm9yaWdpbl9qdGkiOiIzOWM2MGU3NC0zOGI0LTQ0OWMtYmFhOS0xMmQ2M2I1NTJmOWUiLCJldmVudF9pZCI6Ijc2NWRjNzAzLWUwZDgtNDlhYi04YzQ2LTg4MjJhYWFiZTMxZCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTIyOTE4ODMsImV4cCI6MTc5MjI5NTQ4MywiaWF0IjoxNzkyMjkxODgzLCJqdGkiOiI1OWM5ODVkNC0yODVhLTQ0MzQtODUzNi0yMWIyMGZjZDBmYjQiLCJ1c2VybmFtZSI6ImFsaWNlIn0.signature-redacted",
+          "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
+          "X-Forwarded-For": "203.0.113.10",
+          "Content-Length": "141",
+          "x-amzn-vpce-id": "",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": 887358917,
+          "jsonrpc": "2.0",
+          "method": "tools/call",
+          "params": {
+            "name": "orders___get_order",
+            "arguments": {
+              "orderId": "order-2002"
+            }
+          }
+        },
+        "context": null
+      },
+      "gatewayResponse": null,
+      "rawGatewayRequest": {
+        "body": "{\"jsonrpc\": \"2.0\", \"id\": 887358917, \"method\": \"tools/call\", \"params\": {\"name\": \"orders___get_order\", \"arguments\": {\"orderId\": \"order-2002\"}}}"
+      }
+    }
+  },
+  "response": null,
+  "observed": {
+    "status": 403,
+    "body": {
+      "jsonrpc": "2.0",
+      "id": 887358917,
+      "error": {
+        "code": -32000,
+        "message": "ReadOrder is not permitted for this caller"
+      }
+    }
+  }
+}
