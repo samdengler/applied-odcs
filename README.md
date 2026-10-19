@@ -47,6 +47,7 @@ make call VARIANT=runtime USER=carol TOOL=list_orders
 make record VARIANT=runtime USER=... TOOL=...  # into orders/tests/events/runtime/
 make compare-live                              # each runtime recording against its Lambda function target recording
 make latency VARIANT=runtime USER=carol        # ten timed tools/call round trips
+make sessions VARIANT=runtime MINUTES=5        # the server's part of each call, from the Runtime log streams
 make demo VARIANT=runtime
 ```
 

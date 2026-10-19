@@ -18,7 +18,7 @@ STACK := $(if $(filter runtime,$(VARIANT)),AppliedOdcsRuntime,AppliedOdcs)
 OUTPUTS := build/outputs$(if $(VARIANT),-$(VARIANT)).json
 CDK := npx cdk -c variant=$(VARIANT)
 
-.PHONY: sync build check prove bundle server-build server-smoke synth baseline compare-baseline deploy deploy-guard users token call tools record compare-live latency demo
+.PHONY: sync build check prove bundle server-build server-smoke synth baseline compare-baseline deploy deploy-guard users token call tools record compare-live latency sessions demo
 
 sync:
 	uv sync
@@ -106,6 +106,12 @@ record:
 # other stack's env file to time it from here.
 latency:
 	@uv run --env-file $(ENV) python -P client/latency.py $(USER) $(TOOL) 10 2
+
+# The server's part of each tool call, from the Runtime sessions of the
+# last MINUTES.
+MINUTES ?= 5
+sessions:
+	@uv run --env-file $(ENV) python scripts/runtime_sessions.py $(MINUTES)
 
 # Each runtime recording against its Lambda function target recording.
 compare-live:

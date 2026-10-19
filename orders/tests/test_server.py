@@ -31,8 +31,13 @@ def _load(name, path):
 
 
 @pytest.fixture
-def server():
-    return _load("orders_server", ORDERS / "server" / "server.py").mcp
+def module():
+    return _load("orders_server", ORDERS / "server" / "server.py")
+
+
+@pytest.fixture
+def server(module):
+    return module.mcp
 
 
 @pytest.fixture
@@ -85,6 +90,17 @@ async def test_unknown_order_is_a_tool_error(server, handler):
     assert result.content[0].text == "Error executing tool get_order: unknown orderId: 'order-0'"
     with pytest.raises(ValueError, match="unknown orderId: 'order-0'"):
         handler("get_order", {"orderId": "order-0"})
+
+
+@pytest.mark.anyio
+async def test_warm_up_calls_every_tool_and_changes_no_order(module):
+    before = json.loads(json.dumps(module.ORDERS))
+    app = module.mcp.streamable_http_app()
+    async with app.router.lifespan_context(app):
+        await module.warm_up(app)
+    called = {m["params"]["name"] for m in module.WARM_UP if m["method"] == "tools/call"}
+    assert called == set(SCHEMA)
+    assert module.ORDERS == before
 
 
 @pytest.fixture

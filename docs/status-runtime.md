@@ -23,7 +23,7 @@ The run of `docs/plan-runtime.md` on branch `runtime-mcp`, in the worktree at `~
 
 ## What is deployed
 
-Stack `AppliedOdcsRuntime` in account 009080466601 (the default profile's SSO account), us-east-1, plain aws-cdk-lib 2.273.0, interceptors on cedar-odcs v0.2.5, Runtime on platform V2.  `AppliedOdcs` is unchanged and still deployed from the main checkout; this session deployed nothing to it.
+Stack `AppliedOdcsRuntime` in account 009080466601 (the default profile's SSO account), us-east-1, plain aws-cdk-lib 2.273.0, interceptors on cedar-odcs v0.2.5, Runtime on platform V2 (version 4, the server with the warm-up).  `AppliedOdcs` is unchanged and still deployed from the main checkout; this session deployed nothing to it.
 
 | Output | Value |
 | --- | --- |
@@ -145,6 +145,31 @@ V2 is slower than V1 at the median (about 3.0 s against 1.6 s) and steadier (no 
 Where the time goes, from the Runtime log streams.  On both platforms each tool call is one Runtime session, and inside it the Gateway sends three requests about 300 ms apart (`initialize`, then `notifications/initialized`, then `tools/call`), about 620 ms from the first to the tool's answer.  On V1 the server process in the session had started 24 seconds before the call arrived (a pre-warmed process), so process start is not on the call's path; the step 6 note that each call starts a server process was right about fresh memory and wrong as the cause of the latency.  The rest of the round trip, about 1 s on V1 and 2.4 s on V2, is outside what the server logs: the Gateway's interceptors (about 0.4 s in total on the main stack), the OAuth token, and the Runtime assigning a session before the first request reaches the server.  V2's extra time is in that last part or the token, not in the server.  V2 also names log streams `runtime-logs-<uuid>` where V1 used `<date>/[runtime-logs]<uuid>`.
 
 Both platforms probe `GET /ping` about 2 s after a call and get a 404 from FastMCP, then fall back to MCP `ping` requests every 2 s for the life of the session.
+
+### Warm-up before the V2 snapshot
+
+Asked: whether the server does all it can before the V2 snapshot.  The AWS guide ("Optimize your agent for AgentCore Runtime V2") says the snapshot captures whatever the process does before it listens.  `server.py` already did its imports, read `orders.json`, and registered the tools at module scope.  What it left out was the first request's code paths.  `python server.py` now starts the app's session manager, posts the Gateway's requests to the app in process (`initialize`, `notifications/initialized`, `tools/list`, and one `tools/call` of each tool, the writes with an unknown `orderId` so `ORDERS` does not change), and only then starts uvicorn.  `test_server.py` checks that the warm-up calls every tool and changes no order.  On the Mac the 8 requests take 9 ms.  On V2 the warm-up ran in a `build-logs-<uuid>` stream during the snapshot build, twice 0.9 s apart (22 ms and 27 ms), and in no session stream.
+
+The three configurations measured in one sitting, two rounds of `make latency` each (Carol `list_orders`, 10 timed calls after 2 warmups), in this order: V2 with the old server (Runtime version 2), V1 with the old server (version 3, the platform set to V1 for the run and not committed), V2 with the warm-up (version 4).  Nearest-rank percentiles, in ms:
+
+| Configuration | Calls | Min | p50 | p75 | p90 | p95 | p99 | Max | Mean | Over 5 s |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| V1 | 20 | 1524 | 1703 | 6549 | 6557 | 6656 | 6661 | 6661 | 3834 | 9 |
+| V1, two more rounds | 20 | 1490 | 1637 | 1770 | 6445 | 6497 | 6531 | 6531 | 2820 | 5 |
+| V2 | 20 | 2697 | 3074 | 3235 | 3521 | 3527 | 3696 | 3696 | 3117 | 0 |
+| V2 with the warm-up | 20 | 2574 | 2969 | 3175 | 3233 | 3295 | 3772 | 3772 | 2998 | 0 |
+
+V1 has two modes, about 1.6 s and about 6.5 s, and the slow one was 9 of 20 calls right after the deploy and 5 of 20 in the two rounds after; the earlier V1 runs had 2 of 20.  V2 has one mode around 3.0 s.  The warm-up moved V2's p50 by 105 ms and its mean by 119 ms, about the spread between rounds of the same configuration.
+
+From the session streams (`make sessions VARIANT=runtime MINUTES=<n>`, `scripts/runtime_sessions.py`: per session, the first log line to the `initialize` response, `initialize` to the tool's answer, and the `tools/call` handling):
+
+| Configuration | Sessions | First line to `initialize` | `initialize` to answer | Tool handling |
+| --- | --- | --- | --- | --- |
+| V1 | 24 and 18 | 14.6 s and 12.1 s (pre-warmed processes) | 532 and 527 ms | 4 ms |
+| V2 | 24 | 65 ms | 618 ms | 4 ms |
+| V2 with the warm-up | 22 | 38 ms | 585 ms | 2 ms |
+
+The warm-up saves about 2 ms of tool handling and about 30 ms between restore and `initialize`.  The server answers each request in a few milliseconds on every configuration, and the 520 to 620 ms inside the session is the Gateway's pacing of its three requests.  The rest of V2's round trip, about 2.4 s, happens before the first request reaches the server, where code in the image cannot reach it.  Each restored V2 session begins with an MCP `ping` and a uvicorn `WARNING: Invalid HTTP request received` before `initialize`, on both V2 images; V1 shows the warning in about half its sessions.  The stack stays on V2 with the warm-up.
 
 ## Defaults taken
 
