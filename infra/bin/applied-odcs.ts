@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// One stack in the personal account, us-east-1, default profile.  On the
-// shared-interceptor branch it is AppliedOdcsShared, beside main's
-// AppliedOdcs, so main's deployed demo is never touched from here.
+// One stack in the personal account, us-east-1, default profile:
+// AppliedOdcsShared.  The earlier orders demo's AppliedOdcs stack, at tag
+// demo-lambda-target, is never deployed from here.
 import * as cdk from 'aws-cdk-lib';
 import { GovernedToolStack } from '../lib/governed-tool-stack';
 

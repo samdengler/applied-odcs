@@ -12,9 +12,9 @@ questions doc linked at the top of `docs/plan.md`.
   `cedar_odcs/` is copied here.
 - `interceptor/` is the shared interceptor Lambda.  It holds no use case
   and reads each target's policy file from S3 (`docs/shared-interceptor.md`).
-- This is the `shared-interceptor` branch.  It deploys only the
-  `AppliedOdcsShared` stack, with `.env.applied-odcs-shared`; main's
-  `AppliedOdcs` stack is never deployed from here.
+- `make deploy` deploys only the `AppliedOdcsShared` stack, with
+  `.env.applied-odcs-shared`.  `AppliedOdcs` is the earlier orders demo, at
+  tag `demo-lambda-target`; nothing here deploys it.
 - `Makefile` is the interface.  Every verification in the plan is a target.
 - `cedar-odcs` is checked out at `../cedar-odcs`.  Changes to it follow its
   own `CLAUDE.md` (Beads for its task tracking: `bd` an issue per change,

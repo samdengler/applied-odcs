@@ -1,4 +1,4 @@
-# applied-odcs, shared-interceptor branch
+# applied-odcs
 
 One governed MCP tool behind an Amazon Bedrock AgentCore Gateway, decided
 by one interceptor Lambda that holds no use case.  `hr/` is an HR API
@@ -8,9 +8,10 @@ every call with cedar-odcs v0.2.6: Alice may change her own address,
 and a call naming Bob is refused before the tool runs.  This is use
 case 1 of "Writes the Gateway decides from the request".
 
-The branch deploys its own stack, `AppliedOdcsShared`, with its own
-user pool, Gateway, and env file, beside main's `AppliedOdcs`.  The
-design and what was observed are in `docs/shared-interceptor.md`.
+The stack is `AppliedOdcsShared`, with its own user pool, Gateway, and
+env file.  The earlier orders demo, stack `AppliedOdcs`, is at tag
+`demo-lambda-target`; nothing here deploys it.  The design and what was
+observed are in `docs/shared-interceptor.md`.
 
 ## Commands
 

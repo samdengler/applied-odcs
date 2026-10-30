@@ -8,9 +8,9 @@ registry publishes for that target.  The demonstration is use case 1 of
 the doc "Writes the Gateway decides from the request": an employee
 changes their own address.
 
-## What changed from main
+## What changed from the orders demo
 
-| Area | main | this branch |
+| Area | orders demo, tag `demo-lambda-target` | shared interceptor |
 | --- | --- | --- |
 | Engine | cedar-odcs v0.2.4 | cedar-odcs v0.2.6, tagged at `6c9db2b` after `./check.sh` passed (873 tests, every use case's check, 212 history proofs) |
 | Governed tool | `orders/` | `hr/`, copied from cedar-odcs `usecases/hr`; only three import lines differ |
@@ -139,11 +139,12 @@ the request and response functions in the same second each time.  No
 - **v0.2.6 at the head of cedar-odcs `main`.**  The version commit is
   `cb15664`; the head, `6c9db2b`, adds only `usecases/hr`, so the tag is
   on the commit `./check.sh` ran against.
-- **orders leaves the branch.**  v0.2.6's build refuses a `facts.json`
-  holding order records, and its orders policies, tool arguments, and
-  fixtures changed.  Main keeps orders on v0.2.4, untouched.
-- **A separate stack.**  The branch deploys `AppliedOdcsShared` so main's
-  `AppliedOdcs` demo keeps working.  The demo password is in
+- **orders leaves the repository.**  v0.2.6's build refuses a
+  `facts.json` holding order records, and its orders policies, tool
+  arguments, and fixtures changed.  Tag `demo-lambda-target` keeps orders
+  on v0.2.4.
+- **A separate stack.**  `AppliedOdcsShared` is deployed beside the
+  orders demo's `AppliedOdcs`, which keeps working.  The demo password is in
   `.env.applied-odcs-shared` under `APPLIED_ODCS_PASSWORD`.
 - **One JSON document per target.**  A target's policies, tool table,
   and contract facts change together, in one object with one ETag.
@@ -172,5 +173,5 @@ the request and response functions in the same second each time.  No
   entry point.
 - **Use cases 2 and 3.**  The signed-in customer needs the interceptor to
   copy a `reservations` claim into `context.token`, which the policy file
-  would have to name per target.  Neither reservations use case is on
-  this branch.
+  would have to name per target.  Neither reservations use case is in
+  this repository.

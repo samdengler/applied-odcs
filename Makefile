@@ -1,4 +1,4 @@
-# applied-odcs, shared-interceptor branch: every verification is a target.
+# applied-odcs: every verification is a target.
 #
 #   make check                       the pipeline gate, no AWS
 #   make deploy && make users        the stack, then Alice, Bob, Maya, Hana
