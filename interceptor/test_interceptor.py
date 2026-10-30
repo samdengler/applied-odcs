@@ -80,15 +80,15 @@ def error(out: dict) -> str | None:
     return response and response["body"]["error"]["message"]
 
 
-ALICE = {"sub": "alice", "roles": ["employee"]}
+ALICE = {"sub": "alice"}
 ADDRESS = {"homeAddress": {"line1": "48 Pine St"}}
 
 
 # ---- the policy file
 
 
-def test_the_policy_file_carries_the_contract_and_roles_and_no_users_or_records():
-    assert {e["uid"]["type"] for e in HR["entities"]} == {"Contract", "Role"}
+def test_the_policy_file_carries_the_contract_and_no_users_or_records():
+    assert {e["uid"]["type"] for e in HR["entities"]} == {"Contract"}
     assert {e["uid"]["id"] for e in HR["entities"] if e["uid"]["type"] == "Contract"} == {"Employee", "Employee/writers"}
     assert HR["target"] == "hr"
     assert HR["tools"] == USE_CASE.tools
@@ -178,7 +178,7 @@ def test_alice_may_not_change_her_own_salary():
 
 def test_cognito_claims_name_the_caller():
     shared, _ = interceptor(claims=COGNITO)
-    claims = {"sub": "5f1c-uuid", "username": "alice", "cognito:groups": ["employee"]}
+    claims = {"sub": "5f1c-uuid", "username": "alice"}
     own = shared.request(tool_call("hr___update_employee", {"employeeId": "alice", "changes": ADDRESS}, claims))
     other = shared.request(tool_call("hr___update_employee", {"employeeId": "bob", "changes": ADDRESS}, claims))
     assert "transformedGatewayRequest" in own["mcp"]

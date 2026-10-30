@@ -9,7 +9,9 @@ questions doc linked at the top of `docs/plan.md`.
 
 - `hr/` is the governed tool: the folder a tool team would copy.  The
   engine comes from cedar-odcs as a git dependency; nothing from
-  `cedar_odcs/` is copied here.
+  `cedar_odcs/` is copied here.  It holds one rule, an employee reads
+  and changes their own record, and stays that small; the larger HR use
+  case is on branch `hr-full`.
 - `interceptor/` is the shared interceptor Lambda.  It holds no use case
   and reads each target's policy file from S3 (`docs/shared-interceptor.md`).
 - `make deploy` deploys only the `AppliedOdcsShared` stack, with
@@ -26,8 +28,8 @@ questions doc linked at the top of `docs/plan.md`.
   period, no em dashes or en dashes, plain declarative sentences.  Headings
   are noun phrases.
 - Alice, Bob, Carol, Dave, Maya, and Hana are capitalized as people in
-  prose.  Lowercase only when quoting an identifier (`hana-for-alice.json`,
-  a `username` claim, an `owner` value).
+  prose.  Lowercase only when quoting an identifier (`alice.json`, a
+  `username` claim, an `owner` value).
 - Commit messages in the cedar-odcs style: one sentence saying what changed
   and why, no type prefix, body only when the diff does not explain itself.
 - Generated outputs are never committed: `hr/contract/generated/`,

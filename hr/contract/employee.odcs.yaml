@@ -1,5 +1,9 @@
 # Written by hand: the HR system has no catalog this project reads, so
 # there is no contract/unity/ and no pull. cedar-odcs build reads this file.
+#
+# Each field has a level (classification) and a writer. The policies
+# grant the employee the public and confidential levels on their own
+# record, and the fields whose writer is "owner".
 apiVersion: v3.2.0
 kind: DataContract
 id: 5e2a9c41-7b3d-4f0e-a6d8-2c1b9e4f7a30
@@ -29,8 +33,8 @@ schema:
     classification: public
     customProperties:
     - property: writer
-      value: hr
-    description: Legal name; a change needs documents HR checks
+      value: system
+    description: Legal name; changed by HR outside these tools
   - name: workEmail
     logicalType: string
     required: true
@@ -39,32 +43,6 @@ schema:
     - property: writer
       value: system
     description: Work email address
-  - name: jobTitle
-    logicalType: string
-    required: true
-    classification: public
-    customProperties:
-    - property: writer
-      value: hr
-    description: Job title
-  - name: department
-    logicalType: string
-    required: true
-    classification: public
-    customProperties:
-    - property: writer
-      value: hr
-    description: Department
-  - name: manager
-    logicalType: string
-    required: false
-    classification: public
-    customProperties:
-    - property: writer
-      value: hr
-    - property: cedarEntityType
-      value: User
-    description: The employee's manager, as their token's subject names them; absent at the top of the chart
   - name: homeAddress
     logicalType: object
     required: false
@@ -76,23 +54,9 @@ schema:
       customProperties:
       - property: writer
         value: owner
-    - name: line2
-      logicalType: string
-      required: false
-      classification: confidential
-      customProperties:
-      - property: writer
-        value: owner
     - name: city
       logicalType: string
       required: true
-      classification: confidential
-      customProperties:
-      - property: writer
-        value: owner
-    - name: region
-      logicalType: string
-      required: false
       classification: confidential
       customProperties:
       - property: writer
@@ -128,14 +92,6 @@ schema:
     - property: writer
       value: system
     description: Annual base salary; set by the compensation process
-  - name: hrNotes
-    logicalType: string
-    required: false
-    classification: internal
-    customProperties:
-    - property: writer
-      value: hr
-    description: Notes HR keeps on the employee
   - name: bankAccount
     logicalType: string
     required: true
@@ -143,4 +99,4 @@ schema:
     customProperties:
     - property: writer
       value: system
-    description: Where pay is deposited; changed only in the payroll portal
+    description: Where pay is deposited; changed and shown only in the payroll portal

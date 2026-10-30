@@ -6,9 +6,7 @@
     "changes": {
       "homeAddress": {
         "line1": "48 Pine St",
-        "line2": "",
         "city": "Portland",
-        "region": "ME",
         "postalCode": "04102",
         "country": "US"
       }
@@ -31,16 +29,16 @@
           "Accept-Encoding": "identity",
           "x-amzn-vpce-policy-url": "",
           "X-Forwarded-Port": "443",
-          "X-Amzn-Trace-Id": "Root=1-6ae41004-657582f864d5200e344d6fdc",
-          "Authorization": "Bearer eyJraWQiOiJpWHo1d0h2Q2QrZmtSbzZMenBMWk4yZGFtUjBiWUpjbDBYRjRNZlpBekxjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIzNDE4NDRmOC00MDQxLTcwMzctNzAzZi00ZTU5OWYzN2ZmNjgiLCJjb2duaXRvOmdyb3VwcyI6WyJlbXBsb3llZSJdLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV9sV1dHWU0zM28iLCJjbGllbnRfaWQiOiIyYmJmYXI2ZTdsODhlbDUxZG9sNHVudHNpOSIsIm9yaWdpbl9qdGkiOiIwMzk3NjJlZC1jZTFlLTQ2NjEtYTZiMS05ODI2ZThkMDAxZTciLCJldmVudF9pZCI6ImNmZDk5YWUyLWM1MzgtNDM3Ni1hMzFkLTQwMmU3NDlhZDk2NiIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTMzMzEyMDQsImV4cCI6MTc5MzMzNDgwNCwiaWF0IjoxNzkzMzMxMjA0LCJqdGkiOiJiM2FiZTYwMC0zY2ZiLTRkMTktOTM3MC04ZTRjOGIyYjA5NTIiLCJ1c2VybmFtZSI6ImFsaWNlIn0.signature-redacted",
+          "X-Amzn-Trace-Id": "Root=1-6ae47f57-65ff41454d23d91a07ec9234",
+          "Authorization": "Bearer eyJraWQiOiJpWHo1d0h2Q2QrZmtSbzZMenBMWk4yZGFtUjBiWUpjbDBYRjRNZlpBekxjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIzNDE4NDRmOC00MDQxLTcwMzctNzAzZi00ZTU5OWYzN2ZmNjgiLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV9sV1dHWU0zM28iLCJjbGllbnRfaWQiOiIyYmJmYXI2ZTdsODhlbDUxZG9sNHVudHNpOSIsIm9yaWdpbl9qdGkiOiJkZmRjMjgwMy02YzA3LTQ2MGEtOTAxOC1jNDcxMDE0MWFmYjAiLCJldmVudF9pZCI6ImUyYjM3MzMwLTYxNTYtNGZjZi04ZmI4LWI2NmFiNmRjMDBjNiIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTMzNTk3MDIsImV4cCI6MTc5MzM2MzMwMiwiaWF0IjoxNzkzMzU5NzAyLCJqdGkiOiJiYjlkYTEzYy0yZDZmLTRmMzItYWMzYi03NWE1Mjg4ODc5YTEiLCJ1c2VybmFtZSI6ImFsaWNlIn0.signature-redacted",
           "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
           "X-Forwarded-For": "203.0.113.10",
-          "Content-Length": "281",
+          "Content-Length": "252",
           "x-amzn-vpce-id": "",
           "Content-Type": "application/json"
         },
         "body": {
-          "id": 134493370,
+          "id": 457357317,
           "jsonrpc": "2.0",
           "method": "tools/call",
           "params": {
@@ -49,8 +47,6 @@
               "changes": {
                 "homeAddress": {
                   "country": "US",
-                  "region": "ME",
-                  "line2": "",
                   "city": "Portland",
                   "line1": "48 Pine St",
                   "postalCode": "04102"
@@ -64,7 +60,7 @@
       },
       "gatewayResponse": null,
       "rawGatewayRequest": {
-        "body": "{\"jsonrpc\": \"2.0\", \"id\": 134493370, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___update_employee\", \"arguments\": {\"employeeId\": \"bob\", \"changes\": {\"homeAddress\": {\"line1\": \"48 Pine St\", \"line2\": \"\", \"city\": \"Portland\", \"region\": \"ME\", \"postalCode\": \"04102\", \"country\": \"US\"}}}}}"
+        "body": "{\"jsonrpc\": \"2.0\", \"id\": 457357317, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___update_employee\", \"arguments\": {\"employeeId\": \"bob\", \"changes\": {\"homeAddress\": {\"line1\": \"48 Pine St\", \"city\": \"Portland\", \"postalCode\": \"04102\", \"country\": \"US\"}}}}}"
       }
     }
   },
@@ -73,7 +69,7 @@
     "status": 403,
     "body": {
       "jsonrpc": "2.0",
-      "id": 134493370,
+      "id": 457357317,
       "error": {
         "code": -32000,
         "message": "UpdateEmployee is not permitted for this caller"

@@ -7,9 +7,8 @@ from types import SimpleNamespace
 import pytest
 
 HR = Path(__file__).resolve().parents[1]
-FIELDS = {"employeeId", "name", "workEmail", "jobTitle", "department", "manager",
-          "homeAddress", "personalPhone", "salary", "hrNotes", "bankAccount"}
-ADDRESS = {"line1", "line2", "city", "region", "postalCode", "country"}
+FIELDS = {"employeeId", "name", "workEmail", "homeAddress", "personalPhone", "salary", "bankAccount"}
+ADDRESS = {"line1", "city", "postalCode", "country"}
 
 
 def _load():
@@ -29,33 +28,26 @@ def call():
     return lambda tool, event=None: mod.handler(event or {}, _ctx(f"hr___{tool}"))
 
 
-def test_list_employees_returns_four_records(call):
-    rows = call("list_employees")
-    assert [r["employeeId"] for r in rows] == ["alice", "bob", "maya", "hana"]
-    assert all(set(r) <= FIELDS for r in rows)
-
-
 def test_get_employee_returns_alice_with_all_fields(call):
     e = call("get_employee", {"employeeId": "alice"})
     assert e["name"] == "Alice Moreau" and set(e) == FIELDS
 
 
-def test_update_employee_changes_title(call):
-    e = call("update_employee", {"employeeId": "bob", "changes": {"jobTitle": "Staff SRE"}})
-    assert e["jobTitle"] == "Staff SRE"
-    assert call("get_employee", {"employeeId": "bob"})["jobTitle"] == "Staff SRE"
+def test_update_employee_changes_the_phone(call):
+    e = call("update_employee", {"employeeId": "bob", "changes": {"personalPhone": "+1 207 555 0100"}})
+    assert e["personalPhone"] == "+1 207 555 0100"
+    assert call("get_employee", {"employeeId": "bob"})["personalPhone"] == "+1 207 555 0100"
 
 
 def test_nested_change_leaves_other_address_lines(call):
     e = call("update_employee", {"employeeId": "alice",
                                  "changes": {"homeAddress": {"line1": "48 Pine St"}}})
-    assert e["homeAddress"] == {"line1": "48 Pine St", "line2": "Apt 4", "city": "Portland",
-                                "region": "ME", "postalCode": "04101", "country": "US"}
+    assert e["homeAddress"] == {"line1": "48 Pine St", "city": "Portland", "postalCode": "04101", "country": "US"}
 
 
 def test_writes_do_not_leak_between_tests(call):
     assert call("get_employee", {"employeeId": "alice"})["homeAddress"]["line1"] == "12 Harbor St"
-    assert call("get_employee", {"employeeId": "bob"})["jobTitle"] == "Site Reliability Engineer"
+    assert call("get_employee", {"employeeId": "bob"})["personalPhone"] == "+1 207 555 0187"
 
 
 def test_unknown_tool_raises(call):
@@ -86,7 +78,6 @@ def test_schema_matches_handler_and_usecase():
 
 def test_output_schemas_have_the_contract_leaves():
     for t in json.loads((HR / "tools.json").read_text()):
-        out = t["outputSchema"]
-        employee = out["items"] if t["name"] == "list_employees" else out
+        employee = t["outputSchema"]
         assert set(employee["properties"]) == FIELDS
         assert set(employee["properties"]["homeAddress"]["properties"]) == ADDRESS

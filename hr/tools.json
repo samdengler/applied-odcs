@@ -26,28 +26,13 @@
         "workEmail": {
           "type": "string"
         },
-        "jobTitle": {
-          "type": "string"
-        },
-        "department": {
-          "type": "string"
-        },
-        "manager": {
-          "type": "string"
-        },
         "homeAddress": {
           "type": "object",
           "properties": {
             "line1": {
               "type": "string"
             },
-            "line2": {
-              "type": "string"
-            },
             "city": {
-              "type": "string"
-            },
-            "region": {
               "type": "string"
             },
             "postalCode": {
@@ -63,9 +48,6 @@
         },
         "salary": {
           "type": "number"
-        },
-        "hrNotes": {
-          "type": "string"
         },
         "bankAccount": {
           "type": "string"
@@ -105,28 +87,13 @@
         "workEmail": {
           "type": "string"
         },
-        "jobTitle": {
-          "type": "string"
-        },
-        "department": {
-          "type": "string"
-        },
-        "manager": {
-          "type": "string"
-        },
         "homeAddress": {
           "type": "object",
           "properties": {
             "line1": {
               "type": "string"
             },
-            "line2": {
-              "type": "string"
-            },
             "city": {
-              "type": "string"
-            },
-            "region": {
               "type": "string"
             },
             "postalCode": {
@@ -143,80 +110,8 @@
         "salary": {
           "type": "number"
         },
-        "hrNotes": {
-          "type": "string"
-        },
         "bankAccount": {
           "type": "string"
-        }
-      }
-    }
-  },
-  {
-    "name": "list_employees",
-    "description": "Return every employee.",
-    "inputSchema": {
-      "type": "object",
-      "properties": {}
-    },
-    "outputSchema": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "employeeId": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "workEmail": {
-            "type": "string"
-          },
-          "jobTitle": {
-            "type": "string"
-          },
-          "department": {
-            "type": "string"
-          },
-          "manager": {
-            "type": "string"
-          },
-          "homeAddress": {
-            "type": "object",
-            "properties": {
-              "line1": {
-                "type": "string"
-              },
-              "line2": {
-                "type": "string"
-              },
-              "city": {
-                "type": "string"
-              },
-              "region": {
-                "type": "string"
-              },
-              "postalCode": {
-                "type": "string"
-              },
-              "country": {
-                "type": "string"
-              }
-            }
-          },
-          "personalPhone": {
-            "type": "string"
-          },
-          "salary": {
-            "type": "number"
-          },
-          "hrNotes": {
-            "type": "string"
-          },
-          "bankAccount": {
-            "type": "string"
-          }
         }
       }
     }

@@ -40,11 +40,7 @@ def update_employee(event):
     return employee
 
 
-def list_employees(event):
-    return list(EMPLOYEES.values())
-
-
-TOOLS = {f.__name__: f for f in (get_employee, update_employee, list_employees)}
+TOOLS = {f.__name__: f for f in (get_employee, update_employee)}
 
 
 def handler(event, context):

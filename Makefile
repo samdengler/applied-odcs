@@ -1,17 +1,16 @@
 # applied-odcs: every verification is a target.
 #
 #   make check                       the pipeline gate, no AWS
-#   make deploy && make users        the stack, then Alice, Bob, Maya, Hana
+#   make deploy && make users        the stack, then Alice and Bob
 #   make call USER=alice TOOL=update_employee ARGS='{"employeeId":"alice","changes":{...}}'
 #   make publish                     the policy file to S3, no redeploy
 
 SHELL := /bin/bash
 TOOL ?= get_employee
 ARGS ?= {}
-CEDAR_ODCS_CHECKOUT ?= ../cedar-odcs
 ENV := .env.applied-odcs-shared
 
-.PHONY: sync build check prove policies bundle synth deploy publish users token call record demo
+.PHONY: sync build check policies bundle synth deploy publish users token call record demo
 
 sync:
 	uv sync
@@ -20,14 +19,11 @@ sync:
 build:
 	uv run cedar-odcs build hr
 
-# The contract here is the source, so pull is not run; prove needs cargo
-# and cvc5 and is its own target.
+# The contract here is the source, so pull is not run.  There are no
+# guardrails to prove.
 check:
 	uv run cedar-odcs check hr --skip pull --skip prove
 	uv run pytest -q
-
-prove: build
-	CEDAR_ODCS_ANALYSIS=$(CEDAR_ODCS_CHECKOUT)/analysis uv run cedar-odcs prove hr
 
 # build/policies/hr.json: what the registry publishes for target hr.
 policies: build

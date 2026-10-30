@@ -8,7 +8,7 @@ contract facts change together:
       "format": 1,
       "target": "hr",
       "resource": {"type": "Employee", "id": "employeeId",
-                   "attributes": {"employeeId": "User", "manager": "User"}},
+                   "attributes": {"employeeId": "User"}},
       "tools": {"hr___update_employee": {"action": ..., "id": ..., "input": ...,
                                          "payload": ..., "returns": ...}, ...},
       "entities": [<the Contract and Role entities>],
@@ -18,7 +18,7 @@ contract facts change together:
 The tool table is the registry's binding of the target's MCP tools to
 the contract.  resource says how a row the tool returns becomes a Cedar
 entity.  The entities are the contract's tag maps (each field's level
-and writer) and the role hierarchy; users come from the token and
+and writer) and any roles the policies read; users come from the token and
 records from the response, so neither is in the file.
 
 The verbs follow from the resource type: Read<Type> and

@@ -35,11 +35,7 @@ export class GovernedToolStack extends cdk.Stack {
       authFlows: { userPassword: true },
       accessTokenValidity: cdk.Duration.hours(1),
     });
-    // Roles in the Ping token.  The policy file has no users, so every
-    // role a policy reads comes from here.
-    for (const [id, groupName] of [['EmployeeGroup', 'employee'], ['HrGroup', 'hr']]) {
-      new cognito.CfnUserPoolGroup(this, id, { userPoolId: users.userPoolId, groupName });
-    }
+    // No groups: the HR policies read no role, only the caller's username.
 
     const logGroup = (id: string) => new logs.LogGroup(this, id, {
       retention: logs.RetentionDays.ONE_WEEK,

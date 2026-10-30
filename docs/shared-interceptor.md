@@ -8,12 +8,18 @@ registry publishes for that target.  The demonstration is use case 1 of
 the doc "Writes the Gateway decides from the request": an employee
 changes their own address.
 
+On October 30 `hr/` was cut down to one rule, an employee reads and
+changes their own record, so the example shows the interceptor and the
+policy file and little else.  The larger HR use case is on branch
+`hr-full`.  The live results below are from the cut-down version unless
+they say October 29.
+
 ## What changed from the orders demo
 
 | Area | orders demo, tag `demo-lambda-target` | shared interceptor |
 | --- | --- | --- |
 | Engine | cedar-odcs v0.2.4 | cedar-odcs v0.2.6, tagged at `6c9db2b` after `./check.sh` passed (873 tests, every use case's check, 212 history proofs) |
-| Governed tool | `orders/` | `hr/`, copied from cedar-odcs `usecases/hr`; only three import lines differ |
+| Governed tool | `orders/` | `hr/`, cut down from cedar-odcs `usecases/hr` to five policies, two tools, and two employees |
 | Interceptor code | cedar-odcs plus `orders/` and its generated files, loaded from `/var/task/orders` | cedar-odcs plus `interceptor/`, no use case |
 | Policies reach the Lambda | in the deployment package | `s3://<PolicyBucket>/hr.json`, read on first use and rechecked every 60 seconds |
 | Stack | `AppliedOdcs` | `AppliedOdcsShared`, every physical name `applied-odcs-shared` |
@@ -30,12 +36,13 @@ response, or the Gateway.
 | `policies` | Every decision.  The Cedar text, with the rendered grants when a use case has them. |
 | `tools` | The tool table: which action a tool call asks, which argument names the record, which go into `context.input`, which is the write payload, and whether the result is an object or a list.  This is the registry's binding. |
 | `resource` | How a row the tool returns becomes a Cedar entity: its type, its id field, and the fields that become attributes. |
-| `entities` | The `Contract` entities (each field's level and writer, which the field policies look up with `getTag`) and the `Role` hierarchy. |
+| `entities` | The `Contract` entities (each field's level and writer, which the field policies look up with `getTag`), and the `Role` hierarchy when a target's policies read roles.  HR's read none. |
 
 Left out, and where each comes from instead:
 
-- Users and their stored roles: the token.  Every role a policy reads is
-  a Cognito group (`employee`, `hr`).
+- Users: the token.  The HR policies compare the token's username with
+  the employee a call names, and read no role.  A target whose policies
+  read roles would get them from Cognito groups.
 - Records: the response.  cedar-odcs v0.2.6 decides writes on what the
   call names and reads on the record the API returns.
 - `read_action`, `read_field_action`, `field_actions`: the convention
@@ -46,7 +53,7 @@ Left out, and where each comes from instead:
   describes the Gateway's identity provider and is the same for every
   target.
 
-The HR file holds 3 tools, 4 entities, and 12 policies.
+The HR file holds 2 tools, 2 entities, and 5 policies.
 
 ## How the interceptor finds a policy file
 
@@ -67,7 +74,7 @@ over the event.  Any other method passes without a file.
 - A tool name whose prefix is not a target name (`../x___y`) never
   reaches S3.
 
-`interceptor/test_interceptor.py` replays all 22 HR fixture events
+`interceptor/test_interceptor.py` replays all 8 HR fixture events
 through the policy-file interceptor and asserts the same output as
 cedar-odcs's handlers built from the folder, with the users left out of
 the file.
@@ -75,7 +82,8 @@ the file.
 ## The deployed stack
 
 `AppliedOdcsShared` in account 009080466601, us-east-1, deployed on
-October 29 in 62 seconds, beside `AppliedOdcs`.  `make deploy` wrote the
+October 29 in 62 seconds, beside `AppliedOdcs`, and redeployed on
+October 30 with the cut-down `hr/` in 53 seconds.  `make deploy` wrote the
 outputs to `.env.applied-odcs-shared` and published `hr.json` to the
 policy bucket.
 
@@ -86,8 +94,9 @@ policy bucket.
 | UserPoolId | `us-east-1_lWWGYM33o` |
 | PolicyBucket | `appliedodcsshared-policies05f61e66-fuanecg2qzf3` |
 
-Users from `make users`: `alice`, `bob`, and `maya` in group `employee`,
-`hana` in group `hr`.  Teardown, not run: `cd infra && npx cdk destroy
+Users from `make users`: `alice` and `bob`, in no group.  The redeploy
+removed the `employee` and `hr` groups, and `maya` and `hana` were
+deleted from the pool.  Teardown, not run: `cd infra && npx cdk destroy
 AppliedOdcsShared`.  The bucket empties itself on delete.
 
 ### Use case 1, live
@@ -96,26 +105,27 @@ AppliedOdcsShared`.  The bucket empties itself on delete.
 
 | Call | Status | What came back |
 | --- | --- | --- |
-| Alice updates her own address | 200 | Her record with the new address; `hrNotes` and `bankAccount` stripped on the response |
+| Alice updates her own address | 200 | Her record with the new address; `bankAccount` cut on the response |
 | Alice updates Bob's address | 403 | `UpdateEmployee is not permitted for this caller` |
 | Alice updates her address and salary | 403 | `UpdateEmployee rejected; fields not permitted: salary` |
-| Bob reads Alice's record | 200 | The six directory fields: `employeeId`, `name`, `workEmail`, `jobTitle`, `department`, `manager` |
+| Bob reads Alice's record | 403 | `LookupEmployee is not permitted for this caller` |
+| Alice reads her own record | 200 | Her record; `bankAccount` cut on the response |
 
-The tool's log shows two invocations, `hr___update_employee` and
-`hr___get_employee`: the two refused calls never reached it.  Each
-interceptor logged `loaded hr's policy file "2827c0fa..."`, the ETag
-`publish.py` reported.  Init took 313 ms (request) and 410 ms (response),
-the first two invocations of each function 259 to 509 ms (the S3 client
-and the one read), and every call after that about 2 ms.
+While the five calls were recorded, the tool's log showed two
+invocations, Alice's own update and Alice's own read: the three refused
+calls never reached it.  After the redeploy each interceptor logged
+`loaded hr's policy file "4c463a8b..."`, the ETag `publish.py` reported.
+Init took 389 ms (request) and 397 ms (response), and warm calls about
+2 ms, as on October 29 (313 and 410 ms).
 
-The four calls are recorded in `hr/tests/live/`, with token signatures
+The calls are recorded in `hr/tests/live/`, with token signatures
 and the caller's address redacted, and
 `test_live_recording_matches_the_shared_interceptor` replays them through
 the interceptor with Cognito's claims.
 
 ### A published change, live, with no deploy
 
-A file without `employee-updates-own-record` was put in the bucket, and
+On October 29, a file without `employee-updates-own-record` was put in the bucket, and
 Alice's own address change was called before and after the TTL.  Then
 `make publish` restored the real file (its gate ran first: 103 cases
 passed).
@@ -151,8 +161,11 @@ the request and response functions in the same second each time.  No
 - **Keep the last good copy on a failed reread.**  The alternative,
   failing closed after a maximum age, is an open question below.
 - **Live recordings in `hr/tests/live/`.**  The HR fixtures in
-  `hr/tests/events/` carry the use case's own claims (`sub`, `roles`);
-  recordings carry Cognito's, and are replayed with them.
+  `hr/tests/events/` carry the use case's own claim (`sub`); recordings
+  carry Cognito's (`username`), and are replayed with them.
+- **One rule in `hr/`.**  The guardrails, the `prove` target, the roles,
+  and the list tool went with the cut-down use case.  `hr-full` keeps
+  them.
 
 ## Open questions
 
