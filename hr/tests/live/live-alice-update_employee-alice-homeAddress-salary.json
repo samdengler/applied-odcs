@@ -1,0 +1,75 @@
+{
+  "user": "alice",
+  "tool": "update_employee",
+  "arguments": {
+    "employeeId": "alice",
+    "changes": {
+      "homeAddress": {
+        "line1": "48 Pine St"
+      },
+      "salary": 250000
+    }
+  },
+  "request": {
+    "interceptorInputVersion": "1.0",
+    "mcp": {
+      "gatewayRequest": {
+        "path": "/mcp",
+        "httpMethod": "POST",
+        "headers": {
+          "x-amzn-tls-version": "TLSv1.3",
+          "x-amzn-vpce-config": "",
+          "Accept": "application/json, text/event-stream",
+          "X-Forwarded-Proto": "https",
+          "User-Agent": "Python-urllib/3.12",
+          "Host": "applied-odcs-shared-ahp4n92fyp.gateway.bedrock-agentcore.us-east-1.amazonaws.com",
+          "x-amzn-vpc-id": "",
+          "Accept-Encoding": "identity",
+          "x-amzn-vpce-policy-url": "",
+          "X-Forwarded-Port": "443",
+          "X-Amzn-Trace-Id": "Root=1-6ae41013-7fe5b3ec285ae9d4408eabb8",
+          "Authorization": "Bearer eyJraWQiOiJpWHo1d0h2Q2QrZmtSbzZMenBMWk4yZGFtUjBiWUpjbDBYRjRNZlpBekxjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIzNDE4NDRmOC00MDQxLTcwMzctNzAzZi00ZTU5OWYzN2ZmNjgiLCJjb2duaXRvOmdyb3VwcyI6WyJlbXBsb3llZSJdLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV9sV1dHWU0zM28iLCJjbGllbnRfaWQiOiIyYmJmYXI2ZTdsODhlbDUxZG9sNHVudHNpOSIsIm9yaWdpbl9qdGkiOiI4ZWQ3NThjMC01NDlhLTQ1ZjktOWVhNC1hYTExMDNkMTIzNTciLCJldmVudF9pZCI6IjY2NTFjYjIzLTY4MjktNDg4MS1hNzFlLTNmODM0ODUxZGIwZCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTMzMzEyMTgsImV4cCI6MTc5MzMzNDgxOCwiaWF0IjoxNzkzMzMxMjE4LCJqdGkiOiJkYjc4MWIyNy03ZWZhLTQyZWEtYjNlMi0yNmYzZTIxOTMwOTUiLCJ1c2VybmFtZSI6ImFsaWNlIn0.signature-redacted",
+          "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
+          "X-Forwarded-For": "203.0.113.10",
+          "Content-Length": "212",
+          "x-amzn-vpce-id": "",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": 775873547,
+          "jsonrpc": "2.0",
+          "method": "tools/call",
+          "params": {
+            "name": "hr___update_employee",
+            "arguments": {
+              "changes": {
+                "salary": 250000,
+                "homeAddress": {
+                  "line1": "48 Pine St"
+                }
+              },
+              "employeeId": "alice"
+            }
+          }
+        },
+        "context": null
+      },
+      "gatewayResponse": null,
+      "rawGatewayRequest": {
+        "body": "{\"jsonrpc\": \"2.0\", \"id\": 775873547, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___update_employee\", \"arguments\": {\"employeeId\": \"alice\", \"changes\": {\"homeAddress\": {\"line1\": \"48 Pine St\"}, \"salary\": 250000}}}}"
+      }
+    }
+  },
+  "response": null,
+  "observed": {
+    "status": 403,
+    "body": {
+      "jsonrpc": "2.0",
+      "id": 775873547,
+      "error": {
+        "code": -32000,
+        "message": "UpdateEmployee rejected; fields not permitted: salary"
+      }
+    }
+  }
+}
