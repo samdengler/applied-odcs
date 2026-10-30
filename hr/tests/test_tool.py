@@ -7,8 +7,9 @@ from types import SimpleNamespace
 import pytest
 
 HR = Path(__file__).resolve().parents[1]
-FIELDS = {"employeeId", "name", "workEmail", "homeAddress", "personalPhone", "salary", "bankAccount"}
-ADDRESS = {"line1", "city", "postalCode", "country"}
+EMPLOYEE = {"employeeId", "name", "workEmail", "homeAddress", "personalPhone", "salary", "bankAccount"}
+CHANGE = {"changeId", "employeeId", "homeAddress", "effectiveDate", "payrollNotified", "fraudScore"}
+MOVED = {"line1": "48 Pine St", "city": "Portland", "postalCode": "04102", "country": "US"}
 
 
 def _load():
@@ -28,31 +29,33 @@ def call():
     return lambda tool, event=None: mod.handler(event or {}, _ctx(f"hr___{tool}"))
 
 
-def test_get_employee_returns_alice_with_all_fields(call):
-    e = call("get_employee", {"employeeId": "alice"})
-    assert e["name"] == "Alice Moreau" and set(e) == FIELDS
+def test_get_profile_returns_every_field(call):
+    e = call("get_profile", {"employeeId": "alice"})
+    assert e["name"] == "Alice Moreau" and set(e) == EMPLOYEE
 
 
-def test_update_employee_changes_the_phone(call):
-    e = call("update_employee", {"employeeId": "bob", "changes": {"personalPhone": "+1 207 555 0100"}})
-    assert e["personalPhone"] == "+1 207 555 0100"
-    assert call("get_employee", {"employeeId": "bob"})["personalPhone"] == "+1 207 555 0100"
+def test_update_address_returns_the_change_not_the_employee(call):
+    change = call("update_address", {"employeeId": "alice", "address": MOVED})
+    assert set(change) == CHANGE
+    assert change["changeId"] == "chg-0001" and change["homeAddress"] == MOVED
+    assert change["payrollNotified"] is True and change["fraudScore"] == 0.31
+    assert call("get_profile", {"employeeId": "alice"})["homeAddress"] == MOVED
 
 
-def test_nested_change_leaves_other_address_lines(call):
-    e = call("update_employee", {"employeeId": "alice",
-                                 "changes": {"homeAddress": {"line1": "48 Pine St"}}})
-    assert e["homeAddress"] == {"line1": "48 Pine St", "city": "Portland", "postalCode": "04101", "country": "US"}
+def test_update_address_takes_exactly_the_four_lines(call):
+    with pytest.raises(ValueError, match="exactly"):
+        call("update_address", {"employeeId": "alice", "address": {"line1": "48 Pine St"}})
+    with pytest.raises(ValueError, match="exactly"):
+        call("update_address", {"employeeId": "alice", "address": {**MOVED, "salary": 250000}})
 
 
 def test_writes_do_not_leak_between_tests(call):
-    assert call("get_employee", {"employeeId": "alice"})["homeAddress"]["line1"] == "12 Harbor St"
-    assert call("get_employee", {"employeeId": "bob"})["personalPhone"] == "+1 207 555 0187"
+    assert call("get_profile", {"employeeId": "alice"})["homeAddress"]["line1"] == "12 Harbor St"
 
 
 def test_unknown_tool_raises(call):
     with pytest.raises(ValueError, match="unknown tool"):
-        call("drop_table")
+        call("update_employee")
 
 
 def test_missing_tool_name_raises():
@@ -63,21 +66,12 @@ def test_missing_tool_name_raises():
 
 def test_unknown_employee_raises(call):
     with pytest.raises(ValueError, match="unknown employeeId"):
-        call("get_employee", {"employeeId": "nobody"})
+        call("get_profile", {"employeeId": "nobody"})
     with pytest.raises(ValueError, match="unknown employeeId"):
-        call("update_employee", {"employeeId": "nobody", "changes": {}})
+        call("update_address", {"employeeId": "nobody", "address": MOVED})
 
 
 def test_schema_matches_handler_and_usecase():
     from hr.usecase import TOOLS
-    schema = json.loads((HR / "tools.json").read_text())
-    names = {t["name"] for t in schema}
-    assert names == set(_load().TOOLS)
-    assert {n.removeprefix("hr___") for n in TOOLS} <= names
-
-
-def test_output_schemas_have_the_contract_leaves():
-    for t in json.loads((HR / "tools.json").read_text()):
-        employee = t["outputSchema"]
-        assert set(employee["properties"]) == FIELDS
-        assert set(employee["properties"]["homeAddress"]["properties"]) == ADDRESS
+    names = {t["name"] for t in json.loads((HR / "tools.json").read_text())}
+    assert names == set(_load().TOOLS) == {n.removeprefix("hr___") for n in TOOLS}

@@ -28,6 +28,9 @@ own = handler.request(json.loads((events / "request-alice-updates-own-address.js
 assert "transformedGatewayRequest" in own["mcp"], own
 bobs = handler.request(json.loads((events / "request-alice-updates-bobs-address.json").read_text()), None)
 message = bobs["mcp"]["transformedGatewayResponse"]["body"]["error"]["message"]
-assert message == "UpdateEmployee is not permitted for this caller", message
-print("bundle ok: the interceptor from build/lambda, with build/policies/hr.json, passes Alice's own address "
-      f"and refuses Bob's: {message}")
+assert message == "UpdateAddress is not permitted for this caller", message
+change = handler.response(json.loads((events / "response-alice-updates-own-address.json").read_text()), None)
+shown = json.loads(change["mcp"]["transformedGatewayResponse"]["body"]["result"]["content"][0]["text"])
+assert "fraudScore" not in shown and shown["changeId"] == "chg-0001", shown
+print("bundle ok: the interceptor from build/lambda, with build/policies/hr.json, passes Alice's own address, "
+      f"refuses Bob's ({message}), and shows her address change without its fraud score")

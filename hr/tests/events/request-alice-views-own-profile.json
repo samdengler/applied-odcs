@@ -2,7 +2,7 @@
   "interceptorInputVersion": "1.0",
   "mcp": {
     "rawGatewayRequest": {
-      "body": "{\"jsonrpc\": \"2.0\", \"id\": 5, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___update_employee\", \"arguments\": {\"employeeId\": \"alice\", \"changes\": {\"homeAddress\": {\"line1\": \"48 Pine St\"}, \"salary\": 250000}}}}"
+      "body": "{\"jsonrpc\": \"2.0\", \"id\": 1, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___get_profile\", \"arguments\": {\"employeeId\": \"alice\"}}}"
     },
     "gatewayRequest": {
       "path": "/mcp",
@@ -15,18 +15,12 @@
       },
       "body": {
         "jsonrpc": "2.0",
-        "id": 5,
+        "id": 1,
         "method": "tools/call",
         "params": {
-          "name": "hr___update_employee",
+          "name": "hr___get_profile",
           "arguments": {
-            "employeeId": "alice",
-            "changes": {
-              "homeAddress": {
-                "line1": "48 Pine St"
-              },
-              "salary": 250000
-            }
+            "employeeId": "alice"
           }
         }
       }

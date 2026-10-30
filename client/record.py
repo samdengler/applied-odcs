@@ -3,7 +3,7 @@
 Makes the call through call.call, then reads the two interceptors' logged
 events (the handlers log them when CEDAR_ODCS_RECORD=1) from CloudWatch Logs,
 picks the ones whose JSON-RPC id matches, redacts bearer token signatures, and
-writes hr/tests/live/live-<user>-<tool>[-<employeeId>][-<field>...].json.
+writes hr/tests/live/live-<user>-<tool>[-<employeeId>][-<extra field>...].json.
 """
 
 import importlib.util
@@ -90,13 +90,17 @@ def fetch_messages(logs, group: str, marker: str, start_ms: int) -> list[str]:
             return messages
 
 
+ADDRESS_LINES = {"line1", "city", "postalCode", "country"}
+
+
 def output_name(user: str, tool: str, arguments: dict) -> str:
     name = f"live-{user}-{tool}"
     if arguments.get("employeeId"):
         name += f"-{arguments['employeeId']}"
-    # Two updates of one record differ only in the fields they set.
-    if isinstance(arguments.get("changes"), dict):
-        name += "".join(f"-{field}" for field in sorted(arguments["changes"]))
+    # Two address changes of one employee differ only in a field sent
+    # beside the four lines.
+    if isinstance(arguments.get("address"), dict):
+        name += "".join(f"-{field}" for field in sorted(set(arguments["address"]) - ADDRESS_LINES))
     return name + ".json"
 
 

@@ -8,20 +8,23 @@ registry publishes for that target.  The demonstration is use case 1 of
 the doc "Writes the Gateway decides from the request": an employee
 changes their own address.
 
-On October 30 `hr/` was cut down to one rule, an employee reads and
-changes their own record, so the example shows the interceptor and the
-policy file and little else.  The larger HR use case is on branch
-`hr-full`.  The live results below are from the cut-down version unless
-they say October 29.
+On October 30 `hr/` was cut down to one rule, an employee sees their
+own profile and changes their own address, so the example shows the
+interceptor and the policy file and little else.  Its two tools are
+named for a business intent, `get_profile` and `update_address`, and
+each returns its own model of the contract, `Employee` and
+`AddressChange`.  The larger HR use case is on branch `hr-full`.  The
+live results below are from this version unless they say October 29.
 
 ## What changed from the orders demo
 
 | Area | orders demo, tag `demo-lambda-target` | shared interceptor |
 | --- | --- | --- |
 | Engine | cedar-odcs v0.2.4 | cedar-odcs v0.2.6, tagged at `6c9db2b` after `./check.sh` passed (873 tests, every use case's check, 212 history proofs) |
-| Governed tool | `orders/` | `hr/`, cut down from cedar-odcs `usecases/hr` to five policies, two tools, and two employees |
+| Governed tool | `orders/` | `hr/`, cut down from cedar-odcs `usecases/hr` to two intent tools, two models, seven policies, and two employees |
 | Interceptor code | cedar-odcs plus `orders/` and its generated files, loaded from `/var/task/orders` | cedar-odcs plus `interceptor/`, no use case |
 | Policies reach the Lambda | in the deployment package | `s3://<PolicyBucket>/hr.json`, read on first use and rechecked every 60 seconds |
+| Results | every tool returns the one record type | each tool returns its own model, filtered by the cedar-odcs handlers built for that model |
 | Stack | `AppliedOdcs` | `AppliedOdcsShared`, every physical name `applied-odcs-shared` |
 
 ## The policy file
@@ -34,9 +37,18 @@ response, or the Gateway.
 | Part | What reads it |
 | --- | --- |
 | `policies` | Every decision.  The Cedar text, with the rendered grants when a use case has them. |
-| `tools` | The tool table: which action a tool call asks, which argument names the record, which go into `context.input`, which is the write payload, and whether the result is an object or a list.  This is the registry's binding. |
-| `resource` | How a row the tool returns becomes a Cedar entity: its type, its id field, and the fields that become attributes. |
-| `entities` | The `Contract` entities (each field's level and writer, which the field policies look up with `getTag`), and the `Role` hierarchy when a target's policies read roles.  HR's read none. |
+| `tools` | The tool table: which action a tool call asks, which argument names the employee, which go into `context.input`, which is the payload and which contract field it writes, whether the result is an object or a list, and which model it is.  This is the registry's binding. |
+| `resource` | The model a call names on the request leg: `Employee`, so a call is about `Employee::"alice"`. |
+| `models` | For each model a tool returns, how a result becomes a Cedar entity: its id field and the fields that become attributes.  The interceptor builds one set of cedar-odcs handlers per model. |
+| `entities` | The `Contract` entities, two per model (each field's level and writer, which the field policies look up with `getTag`), and the `Role` hierarchy when a target's policies read roles.  HR's read none. |
+
+The file is format 2.  The interceptor still reads format 1, one model
+for every tool, as format 2 with a single model.  `publish.py` checks
+the binding before it writes: each model is a schema object of the
+contract, each tool's `outputSchema` in `tools.json` names exactly its
+model's fields, and a payload names exactly the lines of the field it
+writes.  That replaces cedar-odcs's tools gate, which requires every
+tool to return the whole `Employee` record.
 
 Left out, and where each comes from instead:
 
@@ -46,14 +58,14 @@ Left out, and where each comes from instead:
 - Records: the response.  cedar-odcs v0.2.6 decides writes on what the
   call names and reads on the record the API returns.
 - `read_action`, `read_field_action`, `field_actions`: the convention
-  `Read<Type>`, `Read<Type>Field`, and `<Verb>Field` for every tool with
-  a payload.  `publish.py` refuses a descriptor that names them
+  `Read<Model>`, `Read<Model>Field`, and `<Verb>Field` for every tool
+  with a payload.  `publish.py` refuses a descriptor that names them
   otherwise.
 - The claims mapping: the Lambda's `CEDAR_ODCS_CLAIMS`, since it
   describes the Gateway's identity provider and is the same for every
   target.
 
-The HR file holds 2 tools, 2 entities, and 5 policies.
+The HR file holds 2 tools, 2 models, 4 entities, and 7 policies, 7,344 bytes.
 
 ## How the interceptor finds a policy file
 
@@ -105,18 +117,20 @@ AppliedOdcsShared`.  The bucket empties itself on delete.
 
 | Call | Status | What came back |
 | --- | --- | --- |
-| Alice updates her own address | 200 | Her record with the new address; `bankAccount` cut on the response |
-| Alice updates Bob's address | 403 | `UpdateEmployee is not permitted for this caller` |
-| Alice updates her address and salary | 403 | `UpdateEmployee rejected; fields not permitted: salary` |
-| Bob reads Alice's record | 403 | `LookupEmployee is not permitted for this caller` |
-| Alice reads her own record | 200 | Her record; `bankAccount` cut on the response |
+| Alice views her profile | 200 | The `Employee` model; `bankAccount` cut on the response |
+| Alice updates her own address | 200 | The `AddressChange` model: `chg-0001`, the new address, `effectiveDate`, `payrollNotified`; `fraudScore` cut on the response |
+| Alice updates Bob's address | 403 | `UpdateAddress is not permitted for this caller` |
+| Alice sends a salary inside the address | 403 | `UpdateAddress rejected; fields not permitted: homeAddress.salary` |
+| Bob views Alice's profile | 403 | `ViewProfile is not permitted for this caller` |
 
-While the five calls were recorded, the tool's log showed two
-invocations, Alice's own update and Alice's own read: the three refused
-calls never reached it.  After the redeploy each interceptor logged
-`loaded hr's policy file "4c463a8b..."`, the ETag `publish.py` reported.
-Init took 389 ms (request) and 397 ms (response), and warm calls about
-2 ms, as on October 29 (313 and 410 ms).
+The Gateway passed the salary inside the address to the interceptor:
+it does not hold the call to the tool's `inputSchema`.  While the five
+calls were recorded, the tool's log showed two invocations,
+`hr___get_profile` and `hr___update_address`, both Alice's own: the
+three refused calls never reached it.  After the redeploy each
+interceptor logged `loaded hr's policy file "0e874ea5..."`, the ETag
+`publish.py` reported.  Init took 399 ms (request) and 407 ms
+(response), as on October 29 (313 and 410 ms).
 
 The calls are recorded in `hr/tests/live/`, with token signatures
 and the caller's address redacted, and
@@ -166,6 +180,11 @@ the request and response functions in the same second each time.  No
 - **One rule in `hr/`.**  The guardrails, the `prove` target, the roles,
   and the list tool went with the cut-down use case.  `hr-full` keeps
   them.
+- **Intent tools and per-tool models in this repository.**  cedar-odcs
+  v0.2.6 has one record type per use case and decides a payload at the
+  paths the argument spells.  `interceptor/` builds one cedar-odcs use
+  case per model and re-roots a `writes` payload at its contract field,
+  with no change to cedar-odcs.
 
 ## Open questions
 
@@ -182,8 +201,16 @@ the request and response functions in the same second each time.  No
   each file once at load.
 - **The router belongs in cedar-odcs.**  `interceptor/handler.py` uses
   two private helpers of `cedar_odcs.gateway.handlers` (`_reject`,
-  `_request_id`).  It would sit beside `gateway/handler.py` as a second
-  entry point.
+  `_request_id`), replaces the `engine` of a `Handlers` to re-root a
+  `writes` payload, and `policy_file.py` reads a contract's schema
+  objects with the private `_leaves`.  Per-tool models and `writes`
+  would sit in cedar-odcs's tool table, with a tools gate that compares
+  each tool with its own model.
+- **The Gateway does not hold a call to its input schema.**  A salary
+  sent inside `address` reached the interceptor.  The interceptor
+  refuses it because the field round asks about every line; a tool
+  without a `writes` binding and no field round would pass it to the
+  API.
 - **Use cases 2 and 3.**  The signed-in customer needs the interceptor to
   copy a `reservations` claim into `context.token`, which the policy file
   would have to name per target.  Neither reservations use case is in

@@ -2,7 +2,7 @@
   "interceptorInputVersion": "1.0",
   "mcp": {
     "rawGatewayRequest": {
-      "body": "{\"jsonrpc\": \"2.0\", \"id\": 3, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___update_employee\", \"arguments\": {\"employeeId\": \"alice\", \"changes\": {\"homeAddress\": {\"line1\": \"48 Pine St\", \"city\": \"Portland\", \"postalCode\": \"04102\", \"country\": \"US\"}}}}}"
+      "body": "{\"jsonrpc\": \"2.0\", \"id\": 3, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___update_address\", \"arguments\": {\"employeeId\": \"alice\", \"address\": {\"line1\": \"48 Pine St\", \"city\": \"Portland\", \"postalCode\": \"04102\", \"country\": \"US\"}}}}"
     },
     "gatewayRequest": {
       "path": "/mcp",
@@ -18,16 +18,14 @@
         "id": 3,
         "method": "tools/call",
         "params": {
-          "name": "hr___update_employee",
+          "name": "hr___update_address",
           "arguments": {
             "employeeId": "alice",
-            "changes": {
-              "homeAddress": {
-                "line1": "48 Pine St",
-                "city": "Portland",
-                "postalCode": "04102",
-                "country": "US"
-              }
+            "address": {
+              "line1": "48 Pine St",
+              "city": "Portland",
+              "postalCode": "04102",
+              "country": "US"
             }
           }
         }

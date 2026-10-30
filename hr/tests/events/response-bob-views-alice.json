@@ -2,7 +2,7 @@
   "interceptorInputVersion": "1.0",
   "mcp": {
     "rawGatewayRequest": {
-      "body": "{\"jsonrpc\": \"2.0\", \"id\": 8, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___get_employee\", \"arguments\": {\"employeeId\": \"alice\"}}}"
+      "body": "{\"jsonrpc\": \"2.0\", \"id\": 8, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___get_profile\", \"arguments\": {\"employeeId\": \"alice\"}}}"
     },
     "gatewayRequest": {
       "path": "/mcp",
@@ -18,7 +18,7 @@
         "id": 8,
         "method": "tools/call",
         "params": {
-          "name": "hr___get_employee",
+          "name": "hr___get_profile",
           "arguments": {
             "employeeId": "alice"
           }

@@ -28,5 +28,20 @@
       }
     },
     "parents": []
+  },
+  {
+    "uid": {
+      "type": "AddressChange",
+      "id": "chg-0001"
+    },
+    "attrs": {
+      "employeeId": {
+        "__entity": {
+          "type": "User",
+          "id": "alice"
+        }
+      }
+    },
+    "parents": []
   }
 ]

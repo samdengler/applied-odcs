@@ -1,6 +1,6 @@
 {
   "user": "bob",
-  "tool": "get_employee",
+  "tool": "get_profile",
   "arguments": {
     "employeeId": "alice"
   },
@@ -21,20 +21,20 @@
           "Accept-Encoding": "identity",
           "x-amzn-vpce-policy-url": "",
           "X-Forwarded-Port": "443",
-          "X-Amzn-Trace-Id": "Root=1-6ae48034-7e9280970ea34ecc232a20df",
-          "Authorization": "Bearer eyJraWQiOiJpWHo1d0h2Q2QrZmtSbzZMenBMWk4yZGFtUjBiWUpjbDBYRjRNZlpBekxjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI3NDE4MTQ3OC1hMGIxLTcwZmYtMjk5Yy05OWFmYTUwZTNkYzciLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV9sV1dHWU0zM28iLCJjbGllbnRfaWQiOiIyYmJmYXI2ZTdsODhlbDUxZG9sNHVudHNpOSIsIm9yaWdpbl9qdGkiOiI3MDY3NzM0Ny1iNDM4LTQyYjctYjcxMS0zMDVjY2UxYzBhMTIiLCJldmVudF9pZCI6IjcyNTc3OTFmLTkzYTMtNGViMi04MDk3LTUzYzhjMWEzZWMzZSIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTMzNTk5MjQsImV4cCI6MTc5MzM2MzUyNCwiaWF0IjoxNzkzMzU5OTI0LCJqdGkiOiIxNWM5NTQ0Ny1hMjk2LTQ1MTktYmIyMS0yN2YwZjk4NTBjODQiLCJ1c2VybmFtZSI6ImJvYiJ9.signature-redacted",
+          "X-Amzn-Trace-Id": "Root=1-6ae48755-5a8860872ded9aea59338ee7",
+          "Authorization": "Bearer eyJraWQiOiJpWHo1d0h2Q2QrZmtSbzZMenBMWk4yZGFtUjBiWUpjbDBYRjRNZlpBekxjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI3NDE4MTQ3OC1hMGIxLTcwZmYtMjk5Yy05OWFmYTUwZTNkYzciLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV9sV1dHWU0zM28iLCJjbGllbnRfaWQiOiIyYmJmYXI2ZTdsODhlbDUxZG9sNHVudHNpOSIsIm9yaWdpbl9qdGkiOiI3N2EwZWYwMy04ZDNjLTRjODQtODhlOS0yNGZlMDNkNWYwOGYiLCJldmVudF9pZCI6IjAzMjE4NDY1LWZkZjAtNDVkZS05MzFmLWQ0N2ZmYjEyMmUwZiIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTMzNjE3NDksImV4cCI6MTc5MzM2NTM0OSwiaWF0IjoxNzkzMzYxNzQ5LCJqdGkiOiIxNThkNzEyNC0yOWUxLTQ3N2YtODY2Ni0yZWNlYWM3YzNiMGQiLCJ1c2VybmFtZSI6ImJvYiJ9.signature-redacted",
           "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
           "X-Forwarded-For": "203.0.113.10",
-          "Content-Length": "138",
+          "Content-Length": "137",
           "x-amzn-vpce-id": "",
           "Content-Type": "application/json"
         },
         "body": {
-          "id": 704699442,
+          "id": 593674702,
           "jsonrpc": "2.0",
           "method": "tools/call",
           "params": {
-            "name": "hr___get_employee",
+            "name": "hr___get_profile",
             "arguments": {
               "employeeId": "alice"
             }
@@ -44,7 +44,7 @@
       },
       "gatewayResponse": null,
       "rawGatewayRequest": {
-        "body": "{\"jsonrpc\": \"2.0\", \"id\": 704699442, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___get_employee\", \"arguments\": {\"employeeId\": \"alice\"}}}"
+        "body": "{\"jsonrpc\": \"2.0\", \"id\": 593674702, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___get_profile\", \"arguments\": {\"employeeId\": \"alice\"}}}"
       }
     }
   },
@@ -53,10 +53,10 @@
     "status": 403,
     "body": {
       "jsonrpc": "2.0",
-      "id": 704699442,
+      "id": 593674702,
       "error": {
         "code": -32000,
-        "message": "LookupEmployee is not permitted for this caller"
+        "message": "ViewProfile is not permitted for this caller"
       }
     }
   }

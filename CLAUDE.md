@@ -9,9 +9,11 @@ questions doc linked at the top of `docs/plan.md`.
 
 - `hr/` is the governed tool: the folder a tool team would copy.  The
   engine comes from cedar-odcs as a git dependency; nothing from
-  `cedar_odcs/` is copied here.  It holds one rule, an employee reads
-  and changes their own record, and stays that small; the larger HR use
-  case is on branch `hr-full`.
+  `cedar_odcs/` is copied here.  It holds one rule, an employee sees
+  their own profile and changes their own address, and stays that
+  small; the larger HR use case is on branch `hr-full`.  Tools are named
+  for a business intent (`update_address`), each returning its own
+  contract model.
 - `interceptor/` is the shared interceptor Lambda.  It holds no use case
   and reads each target's policy file from S3 (`docs/shared-interceptor.md`).
 - `make deploy` deploys only the `AppliedOdcsShared` stack, with

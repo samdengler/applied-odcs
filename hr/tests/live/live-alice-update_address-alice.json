@@ -1,0 +1,148 @@
+{
+  "user": "alice",
+  "tool": "update_address",
+  "arguments": {
+    "employeeId": "alice",
+    "address": {
+      "line1": "48 Pine St",
+      "city": "Portland",
+      "postalCode": "04102",
+      "country": "US"
+    }
+  },
+  "request": {
+    "interceptorInputVersion": "1.0",
+    "mcp": {
+      "gatewayRequest": {
+        "path": "/mcp",
+        "httpMethod": "POST",
+        "headers": {
+          "x-amzn-tls-version": "TLSv1.3",
+          "x-amzn-vpce-config": "",
+          "Accept": "application/json, text/event-stream",
+          "X-Forwarded-Proto": "https",
+          "User-Agent": "Python-urllib/3.12",
+          "Host": "applied-odcs-shared-ahp4n92fyp.gateway.bedrock-agentcore.us-east-1.amazonaws.com",
+          "x-amzn-vpc-id": "",
+          "Accept-Encoding": "identity",
+          "x-amzn-vpce-policy-url": "",
+          "X-Forwarded-Port": "443",
+          "X-Amzn-Trace-Id": "Root=1-6ae48729-3ab319276aeb6699663a1236",
+          "Authorization": "Bearer eyJraWQiOiJpWHo1d0h2Q2QrZmtSbzZMenBMWk4yZGFtUjBiWUpjbDBYRjRNZlpBekxjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIzNDE4NDRmOC00MDQxLTcwMzctNzAzZi00ZTU5OWYzN2ZmNjgiLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV9sV1dHWU0zM28iLCJjbGllbnRfaWQiOiIyYmJmYXI2ZTdsODhlbDUxZG9sNHVudHNpOSIsIm9yaWdpbl9qdGkiOiIxYTdkY2NlNy1hYzVlLTQyNWQtYWZhOC1mNzk4NzVhMjZjNDEiLCJldmVudF9pZCI6IjJhYjVmYzIyLTdhZjMtNDQzMC1iYzQ4LTdmODU0ODRkMzMwYyIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTMzNjE3MDQsImV4cCI6MTc5MzM2NTMwNCwiaWF0IjoxNzkzMzYxNzA0LCJqdGkiOiI0ZjJjMTQ4NS02YTQ2LTRjMWItODYzNC04YzM0YzRjMGY5OTIiLCJ1c2VybmFtZSI6ImFsaWNlIn0.signature-redacted",
+          "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
+          "X-Forwarded-For": "203.0.113.10",
+          "Content-Length": "236",
+          "x-amzn-vpce-id": "",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": 196692625,
+          "jsonrpc": "2.0",
+          "method": "tools/call",
+          "params": {
+            "name": "hr___update_address",
+            "arguments": {
+              "employeeId": "alice",
+              "address": {
+                "country": "US",
+                "city": "Portland",
+                "line1": "48 Pine St",
+                "postalCode": "04102"
+              }
+            }
+          }
+        },
+        "context": null
+      },
+      "gatewayResponse": null,
+      "rawGatewayRequest": {
+        "body": "{\"jsonrpc\": \"2.0\", \"id\": 196692625, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___update_address\", \"arguments\": {\"employeeId\": \"alice\", \"address\": {\"line1\": \"48 Pine St\", \"city\": \"Portland\", \"postalCode\": \"04102\", \"country\": \"US\"}}}}"
+      }
+    }
+  },
+  "response": {
+    "interceptorInputVersion": "1.0",
+    "mcp": {
+      "gatewayRequest": {
+        "path": "/mcp",
+        "httpMethod": "POST",
+        "headers": {
+          "x-amzn-tls-version": "TLSv1.3",
+          "x-amzn-vpce-config": "",
+          "Accept": "application/json, text/event-stream",
+          "User-Agent": "Python-urllib/3.12",
+          "X-Forwarded-Proto": "https",
+          "Host": "applied-odcs-shared-ahp4n92fyp.gateway.bedrock-agentcore.us-east-1.amazonaws.com",
+          "x-amzn-vpc-id": "",
+          "Accept-Encoding": "identity",
+          "x-amzn-vpce-policy-url": "",
+          "X-Forwarded-Port": "443",
+          "X-Amzn-Trace-Id": "Root=1-6ae48729-3ab319276aeb6699663a1236",
+          "Authorization": "Bearer eyJraWQiOiJpWHo1d0h2Q2QrZmtSbzZMenBMWk4yZGFtUjBiWUpjbDBYRjRNZlpBekxjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIzNDE4NDRmOC00MDQxLTcwMzctNzAzZi00ZTU5OWYzN2ZmNjgiLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV9sV1dHWU0zM28iLCJjbGllbnRfaWQiOiIyYmJmYXI2ZTdsODhlbDUxZG9sNHVudHNpOSIsIm9yaWdpbl9qdGkiOiIxYTdkY2NlNy1hYzVlLTQyNWQtYWZhOC1mNzk4NzVhMjZjNDEiLCJldmVudF9pZCI6IjJhYjVmYzIyLTdhZjMtNDQzMC1iYzQ4LTdmODU0ODRkMzMwYyIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTMzNjE3MDQsImV4cCI6MTc5MzM2NTMwNCwiaWF0IjoxNzkzMzYxNzA0LCJqdGkiOiI0ZjJjMTQ4NS02YTQ2LTRjMWItODYzNC04YzM0YzRjMGY5OTIiLCJ1c2VybmFtZSI6ImFsaWNlIn0.signature-redacted",
+          "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
+          "X-Forwarded-For": "203.0.113.10",
+          "Content-Length": "236",
+          "x-amzn-vpce-id": "",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": 196692625,
+          "jsonrpc": "2.0",
+          "method": "tools/call",
+          "params": {
+            "name": "hr___update_address",
+            "arguments": {
+              "employeeId": "alice",
+              "address": {
+                "country": "US",
+                "city": "Portland",
+                "line1": "48 Pine St",
+                "postalCode": "04102"
+              }
+            }
+          }
+        },
+        "context": null
+      },
+      "gatewayResponse": {
+        "path": "/mcp",
+        "httpMethod": "POST",
+        "headers": {},
+        "body": {
+          "jsonrpc": "2.0",
+          "id": 196692625,
+          "result": {
+            "isError": false,
+            "content": [
+              {
+                "type": "text",
+                "text": "{\"changeId\":\"chg-0002\",\"employeeId\":\"alice\",\"homeAddress\":{\"line1\":\"48 Pine St\",\"city\":\"Portland\",\"postalCode\":\"04102\",\"country\":\"US\"},\"effectiveDate\":\"2026-10-30\",\"payrollNotified\":true,\"fraudScore\":0.04}"
+              }
+            ]
+          }
+        },
+        "statusCode": 200,
+        "isStreamingResponse": false
+      },
+      "rawGatewayRequest": {
+        "body": "{\"jsonrpc\": \"2.0\", \"id\": 196692625, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___update_address\", \"arguments\": {\"employeeId\": \"alice\", \"address\": {\"line1\": \"48 Pine St\", \"city\": \"Portland\", \"postalCode\": \"04102\", \"country\": \"US\"}}}}"
+      }
+    }
+  },
+  "observed": {
+    "status": 200,
+    "body": {
+      "jsonrpc": "2.0",
+      "id": 196692625,
+      "result": {
+        "isError": false,
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"changeId\": \"chg-0002\", \"employeeId\": \"alice\", \"homeAddress\": {\"line1\": \"48 Pine St\", \"city\": \"Portland\", \"postalCode\": \"04102\", \"country\": \"US\"}, \"effectiveDate\": \"2026-10-30\", \"payrollNotified\": true}"
+          }
+        ]
+      }
+    }
+  }
+}

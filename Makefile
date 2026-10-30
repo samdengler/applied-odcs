@@ -2,11 +2,11 @@
 #
 #   make check                       the pipeline gate, no AWS
 #   make deploy && make users        the stack, then Alice and Bob
-#   make call USER=alice TOOL=update_employee ARGS='{"employeeId":"alice","changes":{...}}'
+#   make call USER=alice TOOL=update_address ARGS='{"employeeId":"alice","address":{...}}'
 #   make publish                     the policy file to S3, no redeploy
 
 SHELL := /bin/bash
-TOOL ?= get_employee
+TOOL ?= get_profile
 ARGS ?= {}
 ENV := .env.applied-odcs-shared
 
@@ -20,9 +20,14 @@ build:
 	uv run cedar-odcs build hr
 
 # The contract here is the source, so pull is not run.  There are no
-# guardrails to prove.
+# guardrails to prove.  cedar-odcs's tools gate wants every tool to return
+# the whole Employee record; here each tool returns its own model, so the
+# binding check in publish.py (interceptor/policy_file.py) replaces it.
 check:
-	uv run cedar-odcs check hr --skip pull --skip prove
+	uv run cedar-odcs build hr
+	uv run cedar-odcs validate hr
+	uv run cedar-odcs run-tests hr
+	uv run python scripts/publish.py hr
 	uv run pytest -q
 
 # build/policies/hr.json: what the registry publishes for target hr.

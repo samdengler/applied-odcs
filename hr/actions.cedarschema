@@ -1,9 +1,8 @@
 // Every verb takes a User: the employee calling the tools.
 
-// The request leg's verb for reading one record. The response leg
-// decides the read again with ReadEmployee, on the record the API
-// returns.
-action LookupEmployee appliesTo {
+// The request leg's verbs, one per business intent. Each names the
+// employee's record; the call names the employee in context.input.
+action ViewProfile appliesTo {
   principal: [User],
   resource: [Employee],
   context: {
@@ -13,6 +12,29 @@ action LookupEmployee appliesTo {
   }
 };
 
+action UpdateAddress appliesTo {
+  principal: [User],
+  resource: [Employee],
+  context: {
+    input?: {
+      employeeId?: User
+    }
+  }
+};
+
+// One per line update_address sends, named at its Employee path.
+action UpdateAddressField appliesTo {
+  principal: [User],
+  resource: [Employee],
+  context: {
+    field?: String,
+    input?: {
+      employeeId?: User
+    }
+  }
+};
+
+// The response leg's verbs, two per model: the record, then each field.
 action ReadEmployee appliesTo {
   principal: [User],
   resource: [Employee]
@@ -26,23 +48,15 @@ action ReadEmployeeField appliesTo {
   }
 };
 
-action UpdateEmployee appliesTo {
+action ReadAddressChange appliesTo {
   principal: [User],
-  resource: [Employee],
-  context: {
-    input?: {
-      employeeId?: User
-    }
-  }
+  resource: [AddressChange]
 };
 
-action UpdateEmployeeField appliesTo {
+action ReadAddressChangeField appliesTo {
   principal: [User],
-  resource: [Employee],
+  resource: [AddressChange],
   context: {
-    field?: String,
-    input?: {
-      employeeId?: User
-    }
+    field?: String
   }
 };

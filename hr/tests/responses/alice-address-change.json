@@ -1,0 +1,13 @@
+{
+  "changeId": "chg-0001",
+  "employeeId": "alice",
+  "homeAddress": {
+    "line1": "48 Pine St",
+    "city": "Portland",
+    "postalCode": "04102",
+    "country": "US"
+  },
+  "effectiveDate": "2026-10-30",
+  "payrollNotified": true,
+  "fraudScore": 0.31
+}

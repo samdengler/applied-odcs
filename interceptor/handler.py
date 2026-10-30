@@ -3,8 +3,10 @@ policy files the registry publishes (policy_file.py).
 
 The Gateway names each tool <target>___<tool>.  On a tools/call the
 handler takes the target from the name, gets that target's policy
-file, and hands the event to cedar-odcs's handlers built from it.  The
-code holds nothing of any use case, so every Gateway runs the same
+file, and hands the event to cedar-odcs's handlers built from it: on
+the request leg the handlers for what a call names, and on the
+response leg the handlers for the model the tool returns.  The code
+holds nothing of any use case, so every Gateway runs the same
 function, and a published policy file takes effect without a deploy.
 
   CEDAR_ODCS_POLICIES      s3://bucket/prefix/ in the Lambda, or a
@@ -36,6 +38,7 @@ belongs in cedar-odcs, beside gateway/handler.py, once the approach is
 settled.
 """
 
+import dataclasses
 import hashlib
 import json
 import logging
@@ -47,10 +50,11 @@ from pathlib import Path
 
 import boto3
 from botocore.exceptions import ClientError
+from cedar_odcs.engine.enforce import Engine
 from cedar_odcs.engine.identities import ClaimsMapping
 from cedar_odcs.gateway.handlers import Handlers, _reject, _request_id
 
-from interceptor.policy_file import SEPARATOR, ungoverned, use_case
+from interceptor.policy_file import SEPARATOR, models, ungoverned
 
 log = logging.getLogger("cedar-odcs")
 # A Gateway target name, never a path: it becomes part of a key or a file name.
@@ -110,21 +114,61 @@ def source(location: str):
     return S3Source(location) if location.startswith("s3://") else DirectorySource(location)
 
 
+class _Engine(Engine):
+    """cedar-odcs's engine, with the payload of a tool that writes one
+    contract field placed at that field's path, so the field round asks
+    about homeAddress.line1 where the call sent address.line1."""
+
+    def __init__(self, use_case, writes: dict):
+        super().__init__(use_case)
+        self.writes = writes
+
+    def decide_request(self, claims: dict, call):
+        path = self.writes.get(call.action)
+        if path is not None and isinstance(call.payload, dict) and call.payload:
+            payload = call.payload
+            for key in reversed(path.split(".")):
+                payload = {key: payload}
+            call = dataclasses.replace(call, payload=payload)
+        return super().decide_request(claims, call)
+
+
+class Target:
+    """One target's cedar-odcs handlers: one for the request leg, built
+    for what a call names, and one per model for the response leg,
+    chosen by the model the called tool returns."""
+
+    def __init__(self, document: dict, target: str, claims: ClaimsMapping = ClaimsMapping()):
+        request, responses, self.tool_models, writes = models(document, target, claims)
+        self.request = Handlers(request)
+        self.request.engine = _Engine(request, writes)
+        self.responses = {model: Handlers(use_case) for model, use_case in responses.items()}
+
+    def request_handler(self, event: dict, context=None) -> dict:
+        return self.request.request_handler(event, context)
+
+    def response_handler(self, event: dict, context=None) -> dict:
+        model = self.tool_models.get(_tool_name(event))
+        # A tool the file does not name goes to the request handlers,
+        # which withhold its result as cedar-odcs does.
+        return (self.responses[model] if model else self.request).response_handler(event, context)
+
+
 @dataclass
 class _Entry:
-    handlers: Handlers | None  # None: the source has no file for the target
+    handlers: Target | None  # None: the source has no file for the target
     etag: str | None
     checked: float
 
 
 class PolicyFiles:
-    """Each target's cedar-odcs handlers, built from its policy file."""
+    """Each target's handlers, built from its policy file."""
 
     def __init__(self, source, ttl: float = 60, claims: ClaimsMapping = ClaimsMapping(), clock=time.monotonic):
         self.source, self.ttl, self.claims, self.clock = source, ttl, claims, clock
         self._entries: dict[str, _Entry] = {}
 
-    def handlers(self, target: str) -> Handlers | None:
+    def handlers(self, target: str) -> Target | None:
         """The target's handlers, or None when no policy file governs it."""
         entry = self._entries.get(target)
         if entry is not None and self.clock() - entry.checked < self.ttl:
@@ -135,7 +179,7 @@ class PolicyFiles:
                 entry = _Entry(entry.handlers, entry.etag, self.clock())
             else:
                 text, etag = fetched
-                entry = _Entry(Handlers(use_case(json.loads(text), target, self.claims)), etag, self.clock())
+                entry = _Entry(Target(json.loads(text), target, self.claims), etag, self.clock())
                 log.info("loaded %s's policy file %s", target, etag)
         except Missing:
             entry = _Entry(None, None, self.clock())
@@ -148,8 +192,8 @@ class PolicyFiles:
         return entry.handlers
 
 
-def _target(event: dict) -> str | None:
-    """The target a well-formed tools/call names; None for anything else."""
+def _tool_name(event: dict) -> str | None:
+    """The tool a well-formed tools/call names; None for anything else."""
     try:
         body = event["mcp"]["gatewayRequest"]["body"]
         if isinstance(body, str):
@@ -159,7 +203,13 @@ def _target(event: dict) -> str | None:
         name = body["params"]["name"]
     except (KeyError, TypeError, ValueError, AttributeError):
         return None
-    if not isinstance(name, str):
+    return name if isinstance(name, str) else None
+
+
+def _target(event: dict) -> str | None:
+    """The target a well-formed tools/call names; None for anything else."""
+    name = _tool_name(event)
+    if name is None:
         return None
     target, separator, _ = name.partition(SEPARATOR)
     return target if separator and TARGET.match(target) else None

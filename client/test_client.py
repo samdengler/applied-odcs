@@ -38,8 +38,10 @@ def test_log_message_parsing_finds_the_marker_and_the_id():
     assert record.parse_log_message("nothing here", "record request ") is None
 
 
-def test_output_name_carries_the_employee_and_the_fields_an_update_sets():
-    assert record.output_name("maya", "list_employees", {}) == "live-maya-list_employees.json"
-    assert record.output_name("bob", "get_employee", {"employeeId": "alice"}) == "live-bob-get_employee-alice.json"
-    assert (record.output_name("alice", "update_employee", {"employeeId": "alice", "changes": {"homeAddress": {}}})
-            == "live-alice-update_employee-alice-homeAddress.json")
+def test_output_name_carries_the_employee_and_any_field_beside_the_address_lines():
+    lines = {"line1": "", "city": "", "postalCode": "", "country": ""}
+    assert record.output_name("bob", "get_profile", {"employeeId": "alice"}) == "live-bob-get_profile-alice.json"
+    assert (record.output_name("alice", "update_address", {"employeeId": "alice", "address": lines})
+            == "live-alice-update_address-alice.json")
+    assert (record.output_name("alice", "update_address", {"employeeId": "alice", "address": {**lines, "salary": 1}})
+            == "live-alice-update_address-alice-salary.json")

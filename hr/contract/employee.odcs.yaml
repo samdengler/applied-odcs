@@ -1,9 +1,11 @@
 # Written by hand: the HR system has no catalog this project reads, so
 # there is no contract/unity/ and no pull. cedar-odcs build reads this file.
 #
-# Each field has a level (classification) and a writer. The policies
-# grant the employee the public and confidential levels on their own
-# record, and the fields whose writer is "owner".
+# Two models, one per thing the HR API returns: Employee, the profile
+# get_profile returns, and AddressChange, the record update_address
+# returns. Each field has a level (classification) and a writer. The
+# policies grant the employee the public and confidential levels of
+# their own records, and the Employee fields whose writer is "owner".
 apiVersion: v3.2.0
 kind: DataContract
 id: 5e2a9c41-7b3d-4f0e-a6d8-2c1b9e4f7a30
@@ -100,3 +102,81 @@ schema:
     - property: writer
       value: system
     description: Where pay is deposited; changed and shown only in the payroll portal
+- name: AddressChange
+  description: One address change, as the HR API records it; the change also tells payroll, for tax withholding, and is screened for payroll diversion
+  properties:
+  - name: changeId
+    logicalType: string
+    required: true
+    classification: public
+    customProperties:
+    - property: writer
+      value: system
+    description: The change's own id
+  - name: employeeId
+    logicalType: string
+    required: true
+    classification: public
+    customProperties:
+    - property: writer
+      value: system
+    - property: cedarEntityType
+      value: User
+    description: The employee who moved, as the token's subject names them
+  - name: homeAddress
+    logicalType: object
+    required: true
+    properties:
+    - name: line1
+      logicalType: string
+      required: true
+      classification: confidential
+      customProperties:
+      - property: writer
+        value: system
+    - name: city
+      logicalType: string
+      required: true
+      classification: confidential
+      customProperties:
+      - property: writer
+        value: system
+    - name: postalCode
+      logicalType: string
+      required: true
+      classification: confidential
+      customProperties:
+      - property: writer
+        value: system
+    - name: country
+      logicalType: string
+      required: true
+      classification: confidential
+      customProperties:
+      - property: writer
+        value: system
+    description: The new home address
+  - name: effectiveDate
+    logicalType: date
+    required: true
+    classification: public
+    customProperties:
+    - property: writer
+      value: system
+    description: The day the new address takes effect
+  - name: payrollNotified
+    logicalType: boolean
+    required: true
+    classification: public
+    customProperties:
+    - property: writer
+      value: system
+    description: Whether payroll was told, so tax withholding follows the move
+  - name: fraudScore
+    logicalType: number
+    required: true
+    classification: restricted
+    customProperties:
+    - property: writer
+      value: system
+    description: The payroll-diversion screen's score for this change; seen only by the fraud team

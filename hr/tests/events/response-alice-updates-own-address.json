@@ -2,7 +2,7 @@
   "interceptorInputVersion": "1.0",
   "mcp": {
     "rawGatewayRequest": {
-      "body": "{\"jsonrpc\": \"2.0\", \"id\": 7, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___update_employee\", \"arguments\": {\"employeeId\": \"alice\", \"changes\": {\"homeAddress\": {\"line1\": \"48 Pine St\", \"city\": \"Portland\", \"postalCode\": \"04102\", \"country\": \"US\"}}}}}"
+      "body": "{\"jsonrpc\": \"2.0\", \"id\": 7, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___update_address\", \"arguments\": {\"employeeId\": \"alice\", \"address\": {\"line1\": \"48 Pine St\", \"city\": \"Portland\", \"postalCode\": \"04102\", \"country\": \"US\"}}}}"
     },
     "gatewayRequest": {
       "path": "/mcp",
@@ -18,16 +18,14 @@
         "id": 7,
         "method": "tools/call",
         "params": {
-          "name": "hr___update_employee",
+          "name": "hr___update_address",
           "arguments": {
             "employeeId": "alice",
-            "changes": {
-              "homeAddress": {
-                "line1": "48 Pine St",
-                "city": "Portland",
-                "postalCode": "04102",
-                "country": "US"
-              }
+            "address": {
+              "line1": "48 Pine St",
+              "city": "Portland",
+              "postalCode": "04102",
+              "country": "US"
             }
           }
         }
@@ -45,22 +43,21 @@
           "content": [
             {
               "type": "text",
-              "text": "{\"employeeId\": \"alice\", \"name\": \"Alice Moreau\", \"workEmail\": \"alice@example.com\", \"homeAddress\": {\"line1\": \"48 Pine St\", \"city\": \"Portland\", \"postalCode\": \"04102\", \"country\": \"US\"}, \"personalPhone\": \"+1 207 555 0142\", \"salary\": 128000, \"bankAccount\": \"021000021 000123456789\"}"
+              "text": "{\"changeId\": \"chg-0001\", \"employeeId\": \"alice\", \"homeAddress\": {\"line1\": \"48 Pine St\", \"city\": \"Portland\", \"postalCode\": \"04102\", \"country\": \"US\"}, \"effectiveDate\": \"2026-10-30\", \"payrollNotified\": true, \"fraudScore\": 0.31}"
             }
           ],
           "structuredContent": {
+            "changeId": "chg-0001",
             "employeeId": "alice",
-            "name": "Alice Moreau",
-            "workEmail": "alice@example.com",
             "homeAddress": {
               "line1": "48 Pine St",
               "city": "Portland",
               "postalCode": "04102",
               "country": "US"
             },
-            "personalPhone": "+1 207 555 0142",
-            "salary": 128000,
-            "bankAccount": "021000021 000123456789"
+            "effectiveDate": "2026-10-30",
+            "payrollNotified": true,
+            "fraudScore": 0.31
           }
         }
       }

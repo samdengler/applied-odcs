@@ -1,16 +1,8 @@
 {
   "user": "alice",
-  "tool": "update_employee",
+  "tool": "get_profile",
   "arguments": {
-    "employeeId": "alice",
-    "changes": {
-      "homeAddress": {
-        "line1": "48 Pine St",
-        "city": "Portland",
-        "postalCode": "04102",
-        "country": "US"
-      }
-    }
+    "employeeId": "alice"
   },
   "request": {
     "interceptorInputVersion": "1.0",
@@ -29,29 +21,21 @@
           "Accept-Encoding": "identity",
           "x-amzn-vpce-policy-url": "",
           "X-Forwarded-Port": "443",
-          "X-Amzn-Trace-Id": "Root=1-6ae47f47-58e5fe246f15b154580ee853",
-          "Authorization": "Bearer eyJraWQiOiJpWHo1d0h2Q2QrZmtSbzZMenBMWk4yZGFtUjBiWUpjbDBYRjRNZlpBekxjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIzNDE4NDRmOC00MDQxLTcwMzctNzAzZi00ZTU5OWYzN2ZmNjgiLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV9sV1dHWU0zM28iLCJjbGllbnRfaWQiOiIyYmJmYXI2ZTdsODhlbDUxZG9sNHVudHNpOSIsIm9yaWdpbl9qdGkiOiI0MGE2OGExZS0yYzI3LTQ2ZjgtODgzYS04ZTE1NDVjMjQyZDYiLCJldmVudF9pZCI6IjNjMmY0NzlhLTVkY2YtNDA1My1iYmM5LTZkYTA4NDVkMzYzMiIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTMzNTk2ODcsImV4cCI6MTc5MzM2MzI4NywiaWF0IjoxNzkzMzU5Njg3LCJqdGkiOiJjZmQyNmNmMS03YjAwLTQyNWItODhlNS1kMGIzNWU4ZGYwNmUiLCJ1c2VybmFtZSI6ImFsaWNlIn0.signature-redacted",
+          "X-Amzn-Trace-Id": "Root=1-6ae48719-0101cc87593cdacb402c1959",
+          "Authorization": "Bearer eyJraWQiOiJpWHo1d0h2Q2QrZmtSbzZMenBMWk4yZGFtUjBiWUpjbDBYRjRNZlpBekxjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIzNDE4NDRmOC00MDQxLTcwMzctNzAzZi00ZTU5OWYzN2ZmNjgiLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV9sV1dHWU0zM28iLCJjbGllbnRfaWQiOiIyYmJmYXI2ZTdsODhlbDUxZG9sNHVudHNpOSIsIm9yaWdpbl9qdGkiOiI0ODlmZmE0My02YTg1LTRhOWUtODQ2Zi0xNGYxYzFiZDhjZDIiLCJldmVudF9pZCI6IjNlODViNGQ1LTA3MzgtNDMwNi1iOTRlLWJhMTQ2OTJjNGIzOSIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTMzNjE2ODgsImV4cCI6MTc5MzM2NTI4OCwiaWF0IjoxNzkzMzYxNjg4LCJqdGkiOiI1MTVkNmI1OC00MDljLTRlYWItOTQyMi1lNTI0MDUyYjBjNDkiLCJ1c2VybmFtZSI6ImFsaWNlIn0.signature-redacted",
           "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
           "X-Forwarded-For": "203.0.113.10",
-          "Content-Length": "254",
+          "Content-Length": "137",
           "x-amzn-vpce-id": "",
           "Content-Type": "application/json"
         },
         "body": {
-          "id": 501503776,
+          "id": 999598881,
           "jsonrpc": "2.0",
           "method": "tools/call",
           "params": {
-            "name": "hr___update_employee",
+            "name": "hr___get_profile",
             "arguments": {
-              "changes": {
-                "homeAddress": {
-                  "country": "US",
-                  "city": "Portland",
-                  "line1": "48 Pine St",
-                  "postalCode": "04102"
-                }
-              },
               "employeeId": "alice"
             }
           }
@@ -60,7 +44,7 @@
       },
       "gatewayResponse": null,
       "rawGatewayRequest": {
-        "body": "{\"jsonrpc\": \"2.0\", \"id\": 501503776, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___update_employee\", \"arguments\": {\"employeeId\": \"alice\", \"changes\": {\"homeAddress\": {\"line1\": \"48 Pine St\", \"city\": \"Portland\", \"postalCode\": \"04102\", \"country\": \"US\"}}}}}"
+        "body": "{\"jsonrpc\": \"2.0\", \"id\": 999598881, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___get_profile\", \"arguments\": {\"employeeId\": \"alice\"}}}"
       }
     }
   },
@@ -81,29 +65,21 @@
           "Accept-Encoding": "identity",
           "x-amzn-vpce-policy-url": "",
           "X-Forwarded-Port": "443",
-          "X-Amzn-Trace-Id": "Root=1-6ae47f47-58e5fe246f15b154580ee853",
-          "Authorization": "Bearer eyJraWQiOiJpWHo1d0h2Q2QrZmtSbzZMenBMWk4yZGFtUjBiWUpjbDBYRjRNZlpBekxjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIzNDE4NDRmOC00MDQxLTcwMzctNzAzZi00ZTU5OWYzN2ZmNjgiLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV9sV1dHWU0zM28iLCJjbGllbnRfaWQiOiIyYmJmYXI2ZTdsODhlbDUxZG9sNHVudHNpOSIsIm9yaWdpbl9qdGkiOiI0MGE2OGExZS0yYzI3LTQ2ZjgtODgzYS04ZTE1NDVjMjQyZDYiLCJldmVudF9pZCI6IjNjMmY0NzlhLTVkY2YtNDA1My1iYmM5LTZkYTA4NDVkMzYzMiIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTMzNTk2ODcsImV4cCI6MTc5MzM2MzI4NywiaWF0IjoxNzkzMzU5Njg3LCJqdGkiOiJjZmQyNmNmMS03YjAwLTQyNWItODhlNS1kMGIzNWU4ZGYwNmUiLCJ1c2VybmFtZSI6ImFsaWNlIn0.signature-redacted",
+          "X-Amzn-Trace-Id": "Root=1-6ae48719-0101cc87593cdacb402c1959",
+          "Authorization": "Bearer eyJraWQiOiJpWHo1d0h2Q2QrZmtSbzZMenBMWk4yZGFtUjBiWUpjbDBYRjRNZlpBekxjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIzNDE4NDRmOC00MDQxLTcwMzctNzAzZi00ZTU5OWYzN2ZmNjgiLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV9sV1dHWU0zM28iLCJjbGllbnRfaWQiOiIyYmJmYXI2ZTdsODhlbDUxZG9sNHVudHNpOSIsIm9yaWdpbl9qdGkiOiI0ODlmZmE0My02YTg1LTRhOWUtODQ2Zi0xNGYxYzFiZDhjZDIiLCJldmVudF9pZCI6IjNlODViNGQ1LTA3MzgtNDMwNi1iOTRlLWJhMTQ2OTJjNGIzOSIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTMzNjE2ODgsImV4cCI6MTc5MzM2NTI4OCwiaWF0IjoxNzkzMzYxNjg4LCJqdGkiOiI1MTVkNmI1OC00MDljLTRlYWItOTQyMi1lNTI0MDUyYjBjNDkiLCJ1c2VybmFtZSI6ImFsaWNlIn0.signature-redacted",
           "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
           "X-Forwarded-For": "203.0.113.10",
-          "Content-Length": "254",
+          "Content-Length": "137",
           "x-amzn-vpce-id": "",
           "Content-Type": "application/json"
         },
         "body": {
-          "id": 501503776,
+          "id": 999598881,
           "jsonrpc": "2.0",
           "method": "tools/call",
           "params": {
-            "name": "hr___update_employee",
+            "name": "hr___get_profile",
             "arguments": {
-              "changes": {
-                "homeAddress": {
-                  "country": "US",
-                  "city": "Portland",
-                  "line1": "48 Pine St",
-                  "postalCode": "04102"
-                }
-              },
               "employeeId": "alice"
             }
           }
@@ -116,7 +92,7 @@
         "headers": {},
         "body": {
           "jsonrpc": "2.0",
-          "id": 501503776,
+          "id": 999598881,
           "result": {
             "isError": false,
             "content": [
@@ -131,7 +107,7 @@
         "isStreamingResponse": false
       },
       "rawGatewayRequest": {
-        "body": "{\"jsonrpc\": \"2.0\", \"id\": 501503776, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___update_employee\", \"arguments\": {\"employeeId\": \"alice\", \"changes\": {\"homeAddress\": {\"line1\": \"48 Pine St\", \"city\": \"Portland\", \"postalCode\": \"04102\", \"country\": \"US\"}}}}}"
+        "body": "{\"jsonrpc\": \"2.0\", \"id\": 999598881, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___get_profile\", \"arguments\": {\"employeeId\": \"alice\"}}}"
       }
     }
   },
@@ -139,7 +115,7 @@
     "status": 200,
     "body": {
       "jsonrpc": "2.0",
-      "id": 501503776,
+      "id": 999598881,
       "result": {
         "isError": false,
         "content": [

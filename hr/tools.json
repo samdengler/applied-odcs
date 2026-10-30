@@ -1,7 +1,7 @@
 [
   {
-    "name": "get_employee",
-    "description": "Return one employee by id.",
+    "name": "get_profile",
+    "description": "Show an employee's profile: name, work email, home address, personal phone, and salary.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -56,35 +56,52 @@
     }
   },
   {
-    "name": "update_employee",
-    "description": "Change fields of one employee and return the record.",
+    "name": "update_address",
+    "description": "Record that an employee moved.  The HR system changes their home address, tells payroll so tax withholding follows the move, and screens the change for payroll diversion.  Returns the address change.",
     "inputSchema": {
       "type": "object",
       "properties": {
         "employeeId": {
           "type": "string",
-          "description": "The employee id."
+          "description": "The employee who moved, for example alice."
         },
-        "changes": {
+        "address": {
           "type": "object",
-          "description": "Fields to change.  A nested object such as homeAddress changes only the lines given."
+          "properties": {
+            "line1": {
+              "type": "string"
+            },
+            "city": {
+              "type": "string"
+            },
+            "postalCode": {
+              "type": "string"
+            },
+            "country": {
+              "type": "string"
+            }
+          },
+          "description": "The new home address, every line.",
+          "required": [
+            "line1",
+            "city",
+            "postalCode",
+            "country"
+          ]
         }
       },
       "required": [
         "employeeId",
-        "changes"
+        "address"
       ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
+        "changeId": {
+          "type": "string"
+        },
         "employeeId": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "workEmail": {
           "type": "string"
         },
         "homeAddress": {
@@ -104,14 +121,15 @@
             }
           }
         },
-        "personalPhone": {
-          "type": "string"
+        "effectiveDate": {
+          "type": "string",
+          "format": "date"
         },
-        "salary": {
+        "payrollNotified": {
+          "type": "boolean"
+        },
+        "fraudScore": {
           "type": "number"
-        },
-        "bankAccount": {
-          "type": "string"
         }
       }
     }

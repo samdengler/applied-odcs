@@ -7,14 +7,14 @@
   "shouldValidate": false,
   "requests": [
     {
-      "description": "alice looks up their own record: the call names alice",
+      "description": "alice views their own profile: the call names alice",
       "principal": {
         "type": "User",
         "id": "alice"
       },
       "action": {
         "type": "Action",
-        "id": "LookupEmployee"
+        "id": "ViewProfile"
       },
       "resource": {
         "type": "Employee",
@@ -32,19 +32,19 @@
       },
       "decision": "Allow",
       "reason": [
-        "employee-looks-up-own-record"
+        "employee-views-own-profile"
       ],
       "errors": []
     },
     {
-      "description": "alice may not look up bob's record: the call names bob",
+      "description": "alice may not view bob's profile: the call names bob",
       "principal": {
         "type": "User",
         "id": "alice"
       },
       "action": {
         "type": "Action",
-        "id": "LookupEmployee"
+        "id": "ViewProfile"
       },
       "resource": {
         "type": "Employee",
@@ -65,14 +65,14 @@
       "errors": []
     },
     {
-      "description": "a lookup that names no employee is refused",
+      "description": "a view that names no employee is refused",
       "principal": {
         "type": "User",
         "id": "alice"
       },
       "action": {
         "type": "Action",
-        "id": "LookupEmployee"
+        "id": "ViewProfile"
       },
       "resource": {
         "type": "Employee",
@@ -84,14 +84,14 @@
       "errors": []
     },
     {
-      "description": "alice updates their own record: the call names alice",
+      "description": "alice changes their own address: the call names alice",
       "principal": {
         "type": "User",
         "id": "alice"
       },
       "action": {
         "type": "Action",
-        "id": "UpdateEmployee"
+        "id": "UpdateAddress"
       },
       "resource": {
         "type": "Employee",
@@ -109,19 +109,19 @@
       },
       "decision": "Allow",
       "reason": [
-        "employee-updates-own-record"
+        "employee-updates-own-address"
       ],
       "errors": []
     },
     {
-      "description": "alice may not update bob's record: the call names bob",
+      "description": "alice may not change bob's address: the call names bob",
       "principal": {
         "type": "User",
         "id": "alice"
       },
       "action": {
         "type": "Action",
-        "id": "UpdateEmployee"
+        "id": "UpdateAddress"
       },
       "resource": {
         "type": "Employee",
@@ -142,14 +142,14 @@
       "errors": []
     },
     {
-      "description": "a write that names no employee is refused",
+      "description": "an address change that names no employee is refused",
       "principal": {
         "type": "User",
         "id": "alice"
       },
       "action": {
         "type": "Action",
-        "id": "UpdateEmployee"
+        "id": "UpdateAddress"
       },
       "resource": {
         "type": "Employee",
@@ -168,7 +168,7 @@
       },
       "action": {
         "type": "Action",
-        "id": "UpdateEmployeeField"
+        "id": "UpdateAddressField"
       },
       "resource": {
         "type": "Employee",
@@ -199,7 +199,7 @@
       },
       "action": {
         "type": "Action",
-        "id": "UpdateEmployeeField"
+        "id": "UpdateAddressField"
       },
       "resource": {
         "type": "Employee",
@@ -223,21 +223,21 @@
       "errors": []
     },
     {
-      "description": "alice sets their own personal phone",
+      "description": "a line the contract does not declare is refused: a salary sent inside the address",
       "principal": {
         "type": "User",
         "id": "alice"
       },
       "action": {
         "type": "Action",
-        "id": "UpdateEmployeeField"
+        "id": "UpdateAddressField"
       },
       "resource": {
         "type": "Employee",
         "id": "alice"
       },
       "context": {
-        "field": "personalPhone",
+        "field": "homeAddress.salary",
         "input": {
           "employeeId": {
             "__entity": {
@@ -247,21 +247,19 @@
           }
         }
       },
-      "decision": "Allow",
-      "reason": [
-        "employee-sets-own-fields"
-      ],
+      "decision": "Deny",
+      "reason": [],
       "errors": []
     },
     {
-      "description": "alice may not set their own salary: the writer is system, so an address change carrying a raise is refused whole",
+      "description": "a field outside the address is refused: the writer of salary is system",
       "principal": {
         "type": "User",
         "id": "alice"
       },
       "action": {
         "type": "Action",
-        "id": "UpdateEmployeeField"
+        "id": "UpdateAddressField"
       },
       "resource": {
         "type": "Employee",
@@ -283,130 +281,14 @@
       "errors": []
     },
     {
-      "description": "alice may not set their own name: the writer is system",
+      "description": "alice may not set a line of bob's address",
       "principal": {
         "type": "User",
         "id": "alice"
       },
       "action": {
         "type": "Action",
-        "id": "UpdateEmployeeField"
-      },
-      "resource": {
-        "type": "Employee",
-        "id": "alice"
-      },
-      "context": {
-        "field": "name",
-        "input": {
-          "employeeId": {
-            "__entity": {
-              "type": "User",
-              "id": "alice"
-            }
-          }
-        }
-      },
-      "decision": "Deny",
-      "reason": [],
-      "errors": []
-    },
-    {
-      "description": "alice may not set the bank account pay goes to: the writer is system",
-      "principal": {
-        "type": "User",
-        "id": "alice"
-      },
-      "action": {
-        "type": "Action",
-        "id": "UpdateEmployeeField"
-      },
-      "resource": {
-        "type": "Employee",
-        "id": "alice"
-      },
-      "context": {
-        "field": "bankAccount",
-        "input": {
-          "employeeId": {
-            "__entity": {
-              "type": "User",
-              "id": "alice"
-            }
-          }
-        }
-      },
-      "decision": "Deny",
-      "reason": [],
-      "errors": []
-    },
-    {
-      "description": "alice may not set the whole address as one value: homeAddress is no leaf of the contract, so it fails closed",
-      "principal": {
-        "type": "User",
-        "id": "alice"
-      },
-      "action": {
-        "type": "Action",
-        "id": "UpdateEmployeeField"
-      },
-      "resource": {
-        "type": "Employee",
-        "id": "alice"
-      },
-      "context": {
-        "field": "homeAddress",
-        "input": {
-          "employeeId": {
-            "__entity": {
-              "type": "User",
-              "id": "alice"
-            }
-          }
-        }
-      },
-      "decision": "Deny",
-      "reason": [],
-      "errors": []
-    },
-    {
-      "description": "alice may not set a field the contract does not declare: mass assignment fails closed",
-      "principal": {
-        "type": "User",
-        "id": "alice"
-      },
-      "action": {
-        "type": "Action",
-        "id": "UpdateEmployeeField"
-      },
-      "resource": {
-        "type": "Employee",
-        "id": "alice"
-      },
-      "context": {
-        "field": "payGrade",
-        "input": {
-          "employeeId": {
-            "__entity": {
-              "type": "User",
-              "id": "alice"
-            }
-          }
-        }
-      },
-      "decision": "Deny",
-      "reason": [],
-      "errors": []
-    },
-    {
-      "description": "alice may not set bob's home address",
-      "principal": {
-        "type": "User",
-        "id": "alice"
-      },
-      "action": {
-        "type": "Action",
-        "id": "UpdateEmployeeField"
+        "id": "UpdateAddressField"
       },
       "resource": {
         "type": "Employee",
@@ -428,7 +310,7 @@
       "errors": []
     },
     {
-      "description": "alice sees their own record",
+      "description": "alice sees their own profile",
       "principal": {
         "type": "User",
         "id": "alice"
@@ -444,12 +326,12 @@
       "context": {},
       "decision": "Allow",
       "reason": [
-        "employee-reads-own-record"
+        "employee-reads-own-profile"
       ],
       "errors": []
     },
     {
-      "description": "bob may not see alice's record, should the API return it",
+      "description": "bob may not see alice's profile, should the API return it",
       "principal": {
         "type": "User",
         "id": "bob"
@@ -486,30 +368,7 @@
       },
       "decision": "Allow",
       "reason": [
-        "employee-reads-own-fields"
-      ],
-      "errors": []
-    },
-    {
-      "description": "alice sees the first line of their own home address: confidential",
-      "principal": {
-        "type": "User",
-        "id": "alice"
-      },
-      "action": {
-        "type": "Action",
-        "id": "ReadEmployeeField"
-      },
-      "resource": {
-        "type": "Employee",
-        "id": "alice"
-      },
-      "context": {
-        "field": "homeAddress.line1"
-      },
-      "decision": "Allow",
-      "reason": [
-        "employee-reads-own-fields"
+        "employee-reads-own-profile-fields"
       ],
       "errors": []
     },
@@ -532,7 +391,7 @@
       },
       "decision": "Allow",
       "reason": [
-        "employee-reads-own-fields"
+        "employee-reads-own-profile-fields"
       ],
       "errors": []
     },
@@ -594,6 +453,134 @@
       },
       "context": {
         "field": "name"
+      },
+      "decision": "Deny",
+      "reason": [],
+      "errors": []
+    },
+    {
+      "description": "alice sees their own address change",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "ReadAddressChange"
+      },
+      "resource": {
+        "type": "AddressChange",
+        "id": "chg-0001"
+      },
+      "context": {},
+      "decision": "Allow",
+      "reason": [
+        "employee-reads-own-address-change"
+      ],
+      "errors": []
+    },
+    {
+      "description": "bob may not see alice's address change",
+      "principal": {
+        "type": "User",
+        "id": "bob"
+      },
+      "action": {
+        "type": "Action",
+        "id": "ReadAddressChange"
+      },
+      "resource": {
+        "type": "AddressChange",
+        "id": "chg-0001"
+      },
+      "context": {},
+      "decision": "Deny",
+      "reason": [],
+      "errors": []
+    },
+    {
+      "description": "alice sees the change's effective date: public",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "ReadAddressChangeField"
+      },
+      "resource": {
+        "type": "AddressChange",
+        "id": "chg-0001"
+      },
+      "context": {
+        "field": "effectiveDate"
+      },
+      "decision": "Allow",
+      "reason": [
+        "employee-reads-own-address-change-fields"
+      ],
+      "errors": []
+    },
+    {
+      "description": "alice sees the change's new first line: confidential",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "ReadAddressChangeField"
+      },
+      "resource": {
+        "type": "AddressChange",
+        "id": "chg-0001"
+      },
+      "context": {
+        "field": "homeAddress.line1"
+      },
+      "decision": "Allow",
+      "reason": [
+        "employee-reads-own-address-change-fields"
+      ],
+      "errors": []
+    },
+    {
+      "description": "alice may not see the change's fraud score: restricted",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "ReadAddressChangeField"
+      },
+      "resource": {
+        "type": "AddressChange",
+        "id": "chg-0001"
+      },
+      "context": {
+        "field": "fraudScore"
+      },
+      "decision": "Deny",
+      "reason": [],
+      "errors": []
+    },
+    {
+      "description": "an Employee field is not an AddressChange field: salary is never shown on a change",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "ReadAddressChangeField"
+      },
+      "resource": {
+        "type": "AddressChange",
+        "id": "chg-0001"
+      },
+      "context": {
+        "field": "salary"
       },
       "decision": "Deny",
       "reason": [],
