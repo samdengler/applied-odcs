@@ -7,9 +7,14 @@ questions doc linked at the top of `docs/plan.md`.
 
 ## Layout and interfaces
 
-- `orders/` is the governed tool: the folder a tool team would copy.  The
+- `hr/` is the governed tool: the folder a tool team would copy.  The
   engine comes from cedar-odcs as a git dependency; nothing from
   `cedar_odcs/` is copied here.
+- `interceptor/` is the shared interceptor Lambda.  It holds no use case
+  and reads each target's policy file from S3 (`docs/shared-interceptor.md`).
+- This is the `shared-interceptor` branch.  It deploys only the
+  `AppliedOdcsShared` stack, with `.env.applied-odcs-shared`; main's
+  `AppliedOdcs` stack is never deployed from here.
 - `Makefile` is the interface.  Every verification in the plan is a target.
 - `cedar-odcs` is checked out at `../cedar-odcs`.  Changes to it follow its
   own `CLAUDE.md` (Beads for its task tracking: `bd` an issue per change,
@@ -20,16 +25,16 @@ questions doc linked at the top of `docs/plan.md`.
 - Prose (README, docs, commit messages, comments): two spaces after a
   period, no em dashes or en dashes, plain declarative sentences.  Headings
   are noun phrases.
-- Alice, Bob, Carol, and Dave are capitalized as people in prose.  Lowercase
-  only when quoting an identifier (`carol-for-alice.json`, a `username`
-  claim, an `owner` value).
+- Alice, Bob, Carol, Dave, Maya, and Hana are capitalized as people in
+  prose.  Lowercase only when quoting an identifier (`hana-for-alice.json`,
+  a `username` claim, an `owner` value).
 - Commit messages in the cedar-odcs style: one sentence saying what changed
   and why, no type prefix, body only when the diff does not explain itself.
-- Generated outputs are never committed: `orders/contract/generated/`,
-  `orders/entities.json`, `build/`, `infra/cdk.out/`.
+- Generated outputs are never committed: `hr/contract/generated/`,
+  `hr/entities.json`, `build/`, `infra/cdk.out/`.
 - Secrets are never committed.  The demo password lives in
-  `.env.applied-odcs` (ignored); `docs/status.md` says where it is, not what
-  it is.
+  `.env.applied-odcs-shared` (ignored); `docs/shared-interceptor.md` says
+  where it is, not what it is.
 
 ## Working unattended
 

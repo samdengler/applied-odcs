@@ -1,4 +1,4 @@
-"""Creates Alice, Carol, and Dave in the user pool with the one demo
+"""Creates Alice, Bob, Maya, and Hana in the user pool with the one demo
 password from APPLIED_ODCS_PASSWORD, permanent, and their groups.  Safe
 to run again: an existing user gets the password reset and the groups
 re-added."""
@@ -7,7 +7,8 @@ import os
 
 import boto3
 
-USERS = {"alice": [], "carol": ["support", "employee"], "dave": ["finance", "employee"]}
+# The policy file has no users: each role a policy reads is a group here.
+USERS = {"alice": ["employee"], "bob": ["employee"], "maya": ["employee"], "hana": ["hr"]}
 
 
 def main() -> None:

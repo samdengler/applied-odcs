@@ -1,41 +1,26 @@
 #!/bin/bash
-# The Monday sequence in docs/demo.md, run end to end.  Each step prints
-# its command, then its output.  Step 10, the contract edit, runs on a
-# copy of orders/ under build/, so the repository is never changed.
+# Use case 1, an employee changes their own address, against the deployed
+# Gateway.  Each step prints its command, then its output.  The Gateway
+# decides every write from the call and the token, never from the record,
+# with the policy file the interceptor read from S3.
 set -u
 cd "$(dirname "$0")/.."
+ENV=.env.applied-odcs-shared
+ADDRESS='{"homeAddress":{"line1":"48 Pine St","line2":"","city":"Portland","region":"ME","postalCode":"04102","country":"US"}}'
 
 step() { printf '\n== %s\n$ %s\n' "$1" "$2"; eval "$2"; }
 
-step "1. The contract names the fields" \
-  "grep -nE '^  - name:|classification:|value: (system|owner|support)' orders/contract/order.odcs.yaml | head -40"
-step "2. The pipeline gate, no AWS" \
-  "make -s check 2>&1 | grep -E '^(pull|build|validate|run-tests|prove): |passed'"
-step "3. Alice lists orders" "make -s call USER=alice TOOL=list_orders"
-step "4. Carol lists orders" "make -s call USER=carol TOOL=list_orders"
-step "5. Alice tries a refund" "make -s call USER=alice TOOL=refund_order ARGS='{\"orderId\":\"order-1001\"}'"
-step "6. Dave refunds" "make -s call USER=dave TOOL=refund_order ARGS='{\"orderId\":\"order-1001\"}'"
-step "7. Carol acting for Alice, from the command line" \
-  "uv run cedar-odcs dry-run orders --caller orders/tests/identities/carol-for-alice.json --tool orders___list_orders --response orders/tests/lists/orders.json"
-
-step "8. Alice changes her shipping address" \
-  "make -s call USER=alice TOOL=update_order ARGS='{\"orderId\":\"order-1001\",\"changes\":{\"shippingAddress\":\"2 Elm St\"}}'"
-step "8. Alice tries to write a support note" \
-  "make -s call USER=alice TOOL=update_order ARGS='{\"orderId\":\"order-1001\",\"changes\":{\"internalNotes\":\"please call\"}}'"
-for change in '{"shippingAddress":"2 Elm St"}' '{"internalNotes":"called back"}'; do
-  step "9. Carol acting for Alice sets $change, from the command line" \
-    "uv run cedar-odcs dry-run orders --caller orders/tests/identities/carol-for-alice.json --tool orders___update_order --arg orderId=order-1001 --arg 'changes=$change' | grep -E '^(Identity|Tool|Request)'"
-done
-
-rm -rf build/demo && mkdir -p build/demo && rsync -a --exclude contract/generated --exclude entities.json orders/ build/demo/orders/
-step "10. cardLast4 from confidential to internal (on a copy in build/demo)" \
-  "sed -i '' '/name: cardLast4/,/classification:/s/classification: confidential/classification: internal/' build/demo/orders/contract/order.odcs.yaml && uv run cedar-odcs build build/demo/orders >/dev/null && grep -n -A3 'name: cardLast4' build/demo/orders/contract/order.odcs.yaml"
-for who in alice carol; do
-  step "10. $who after the edit" \
-    "uv run cedar-odcs dry-run build/demo/orders --caller orders/tests/identities/$who.json --tool orders___list_orders --response orders/tests/lists/orders.json | grep -E '^(Identity|Response)'"
-done
-step "10. the gate on the edited contract" \
-  "uv run cedar-odcs check build/demo/orders --skip pull --skip prove | grep -E 'FAIL|^(build|validate|run-tests): |passed'"
-
-step "11. What Carol may do" "uv run cedar-odcs check-access orders --caller orders/tests/identities/carol.json"
-step "12. One case in Cedar's playground" "uv run cedar-odcs share orders --case 'support reads any order' | cut -c1-120"
+step "1. The one permit that decides whose record a write changes" \
+  "sed -n '/@id(\"employee-updates-own-record\")/,/^};/p' hr/policies.cedar"
+step "2. The policy file the interceptors read, in S3" \
+  "uv run --env-file $ENV python -c \"import json, os, boto3; d = json.load(boto3.client('s3').get_object(Bucket=os.environ['POLICY_BUCKET'], Key='hr.json')['Body']); print(os.environ['POLICY_BUCKET'] + '/hr.json:', sorted(d['tools']), len(d['entities']), 'entities', d['policies'].count('@id('), 'policies')\""
+step "3. Alice's token names her" \
+  "make -s token USER=alice 2>&1 >/dev/null | head -2"
+step "4. Alice changes her own address: the Gateway forwards it, the tool writes it" \
+  "make -s call USER=alice TOOL=update_employee ARGS='{\"employeeId\":\"alice\",\"changes\":$ADDRESS}'"
+step "5. Alice names Bob: refused on the request, the tool never runs" \
+  "make -s call USER=alice TOOL=update_employee ARGS='{\"employeeId\":\"bob\",\"changes\":$ADDRESS}'"
+step "6. Alice changes her address and her salary: refused whole, naming the salary" \
+  "make -s call USER=alice TOOL=update_employee ARGS='{\"employeeId\":\"alice\",\"changes\":{\"homeAddress\":{\"line1\":\"48 Pine St\"},\"salary\":250000}}'"
+step "7. Bob reads Alice's record: the directory fields, not her new address" \
+  "make -s call USER=bob TOOL=get_employee ARGS='{\"employeeId\":\"alice\"}'"

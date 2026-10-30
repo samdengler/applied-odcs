@@ -1,9 +1,0 @@
-import pytest
-
-from cedar_odcs.engine.corpus import cases, check
-from orders.usecase import ROOT
-
-
-@pytest.mark.parametrize("policies,entities,request_spec", list(cases(ROOT)))
-def test_case(policies, entities, request_spec):
-    check(policies, entities, request_spec)

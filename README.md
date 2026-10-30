@@ -1,44 +1,49 @@
-# applied-odcs
+# applied-odcs, shared-interceptor branch
 
-One governed MCP tool, deployed.  `orders/` is an orders API behind an
-Amazon Bedrock AgentCore Gateway, and cedar-odcs's request and response
-interceptors decide every call from an ODCS contract and Cedar policies.
-Alice, Carol, and Dave are Cognito users; the same `list_orders` call
-returns each of them only the rows and fields the contract allows.  The
-folder passes `cedar-odcs check` locally with no AWS, and the Gateway
-events recorded from live calls are saved as test fixtures.
+One governed MCP tool behind an Amazon Bedrock AgentCore Gateway, decided
+by one interceptor Lambda that holds no use case.  `hr/` is an HR API
+whose `update_employee` tool changes an employee's record.  The
+interceptor reads the `hr` target's policy file from S3 and decides
+every call with cedar-odcs v0.2.6: Alice may change her own address,
+and a call naming Bob is refused before the tool runs.  This is use
+case 1 of "Writes the Gateway decides from the request".
+
+The branch deploys its own stack, `AppliedOdcsShared`, with its own
+user pool, Gateway, and env file, beside main's `AppliedOdcs`.  The
+design and what was observed are in `docs/shared-interceptor.md`.
 
 ## Commands
 
 ```sh
-make check                      # build, tool schema gate, validate, the corpus, every handler test; no AWS
-make deploy && make users       # the stack in us-east-1, then Alice, Carol, and Dave
-make call USER=carol TOOL=list_orders
-make call USER=alice TOOL=refund_order ARGS='{"orderId":"order-1001"}'
+make check                      # the tool schema gate, validate, the corpus, every test; no AWS
+make deploy && make users       # the stack in us-east-1, the policy file, then Alice, Bob, Maya, and Hana
+make demo                       # use case 1 against the deployed Gateway
+make call USER=alice TOOL=update_employee ARGS='{"employeeId":"alice","changes":{"homeAddress":{"line1":"48 Pine St"}}}'
+make publish                    # a changed policy file to S3; the interceptors use it within 60 seconds
 ```
 
-`make demo` runs the Monday sequence in `docs/demo.md` against the
-deployed Gateway.  `make prove` proves the twelve guardrails against the
-policies; it needs cargo, cvc5, and a cedar-odcs checkout at
-`../cedar-odcs`.  `make record USER=... TOOL=...` saves a live call as
-`orders/tests/events/live-*.json`, which `make check` replays.
+`make prove` proves the twelve guardrails against the policies; it needs
+cargo, cvc5, and a cedar-odcs checkout at `../cedar-odcs`.  `make record
+USER=... TOOL=...` saves a live call as `hr/tests/live/live-*.json`,
+which `make check` replays through the interceptor.
 
 `make deploy` writes the stack outputs and the demo password to
-`.env.applied-odcs`, which git ignores; `.env.applied-odcs.example`
+`.env.applied-odcs-shared`, which git ignores; `.env.applied-odcs.example`
 lists the names.
 
 ## Layout
 
-- `orders/` is the governed tool, the folder a tool team copies: the
-  descriptor (`usecase.py`), the contract (`contract/order.odcs.yaml`)
-  and the role grants (`contract/grants.yaml`), the verb policies, the
-  guardrails, the Gateway tool schema (`tools.json`), the tool Lambda
-  (`tool/`), and the tests.
-- `lambda/bundle.sh` builds the interceptor code: cedar-odcs from its
-  git tag, the Linux cedarpy wheel, and `orders/` with the files the
-  build generates.  Nothing generated is committed.
+- `hr/` is the governed tool, copied from cedar-odcs `usecases/hr`: the
+  descriptor (`usecase.py`), the contract (`contract/employee.odcs.yaml`),
+  the policies, the guardrails, the Gateway tool schema (`tools.json`),
+  the tool Lambda (`tool/`), and the tests.
+- `interceptor/` is the shared interceptor: `handler.py` routes each
+  tool call to its target's policy file and hands it to cedar-odcs's
+  handlers; `policy_file.py` writes a policy file from a use case folder
+  and reads one back.
+- `scripts/publish.py` stands in for the registry: it writes
+  `build/policies/hr.json` and puts it in the policy bucket.
+- `lambda/bundle.sh` builds the interceptor code: `interceptor/` and
+  cedar-odcs from its git tag with the Linux cedarpy wheel.
 - `infra/` is the CDK app, plain `aws-cdk-lib`.
 - `client/` gets a Cognito token, calls the Gateway, and records calls.
-
-The plan is `docs/plan.md`; what was built and what was observed is
-`docs/status.md`.

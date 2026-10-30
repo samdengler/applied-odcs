@@ -3,7 +3,7 @@
 Makes the call through call.call, then reads the two interceptors' logged
 events (the handlers log them when CEDAR_ODCS_RECORD=1) from CloudWatch Logs,
 picks the ones whose JSON-RPC id matches, redacts bearer token signatures, and
-writes orders/tests/events/live-<user>-<tool>[-<orderId>][-<field>...].json.
+writes hr/tests/live/live-<user>-<tool>[-<employeeId>][-<field>...].json.
 """
 
 import importlib.util
@@ -15,7 +15,7 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-EVENTS = ROOT / "orders" / "tests" / "events"
+EVENTS = ROOT / "hr" / "tests" / "live"
 BEARER = re.compile(r"(Bearer\s+[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+)\.[A-Za-z0-9_\-=]*")
 POLL_SECONDS = 60
 POLL_EVERY = 5
@@ -92,9 +92,9 @@ def fetch_messages(logs, group: str, marker: str, start_ms: int) -> list[str]:
 
 def output_name(user: str, tool: str, arguments: dict) -> str:
     name = f"live-{user}-{tool}"
-    if arguments.get("orderId"):
-        name += f"-{arguments['orderId']}"
-    # Two updates of one order differ only in the fields they set.
+    if arguments.get("employeeId"):
+        name += f"-{arguments['employeeId']}"
+    # Two updates of one record differ only in the fields they set.
     if isinstance(arguments.get("changes"), dict):
         name += "".join(f"-{field}" for field in sorted(arguments["changes"]))
     return name + ".json"
@@ -150,6 +150,7 @@ def main(argv: list[str]) -> int:
         "response": redact(response_event) if response_event is not None else None,
         "observed": {"status": outcome["status"], "body": outcome["body"]},
     }
+    EVENTS.mkdir(parents=True, exist_ok=True)
     path = EVENTS / output_name(user, tool, arguments)
     path.write_text(json.dumps(fixture, indent=2) + "\n")
     print(path)
