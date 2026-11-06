@@ -28,8 +28,8 @@
           "Accept-Encoding": "identity",
           "x-amzn-vpce-policy-url": "",
           "X-Forwarded-Port": "443",
-          "X-Amzn-Trace-Id": "Root=1-6ae48747-781d32f944f9df6c336e87b5",
-          "Authorization": "Bearer eyJraWQiOiJpWHo1d0h2Q2QrZmtSbzZMenBMWk4yZGFtUjBiWUpjbDBYRjRNZlpBekxjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIzNDE4NDRmOC00MDQxLTcwMzctNzAzZi00ZTU5OWYzN2ZmNjgiLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV9sV1dHWU0zM28iLCJjbGllbnRfaWQiOiIyYmJmYXI2ZTdsODhlbDUxZG9sNHVudHNpOSIsIm9yaWdpbl9qdGkiOiIzNDRjN2IzZS1mMmM1LTQ4ZWMtOGMzMC0yMTZiMTJlYzUwNWYiLCJldmVudF9pZCI6IjcxOTRlYTNiLWViOTgtNDNlZC05YWJkLTNiYjQwZDhlMjQ3OSIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTMzNjE3MzQsImV4cCI6MTc5MzM2NTMzNCwiaWF0IjoxNzkzMzYxNzM0LCJqdGkiOiI4ZjdkZWJmNC1mZjZkLTQ5NGQtYjc2YS1jOTE2OWJhZjFhOGMiLCJ1c2VybmFtZSI6ImFsaWNlIn0.signature-redacted",
+          "X-Amzn-Trace-Id": "Root=1-6aedd08b-08e5287f598d55ff6871b089",
+          "Authorization": "Bearer eyJraWQiOiJpWHo1d0h2Q2QrZmtSbzZMenBMWk4yZGFtUjBiWUpjbDBYRjRNZlpBekxjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIzNDE4NDRmOC00MDQxLTcwMzctNzAzZi00ZTU5OWYzN2ZmNjgiLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV9sV1dHWU0zM28iLCJjbGllbnRfaWQiOiIyYmJmYXI2ZTdsODhlbDUxZG9sNHVudHNpOSIsIm9yaWdpbl9qdGkiOiJhMjk3YzhlMS1lMGY4LTQxZjUtODYyNy03YjgxNDBhMzYzNzIiLCJldmVudF9pZCI6ImEwNGZmNGY3LTQzODQtNGRiMi05MGI1LWQ0ZjU2ZWUxNDIzMyIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTM5NzAzMTQsImV4cCI6MTc5Mzk3MzkxNCwiaWF0IjoxNzkzOTcwMzE0LCJqdGkiOiJiZGFlN2NlMi1iNTczLTRlYzktOTU4Zi1kOWY4YmRjODUwNWUiLCJ1c2VybmFtZSI6ImFsaWNlIn0.signature-redacted",
           "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
           "X-Forwarded-For": "203.0.113.10",
           "Content-Length": "254",
@@ -37,7 +37,7 @@
           "Content-Type": "application/json"
         },
         "body": {
-          "id": 840754730,
+          "id": 356389819,
           "jsonrpc": "2.0",
           "method": "tools/call",
           "params": {
@@ -58,16 +58,80 @@
       },
       "gatewayResponse": null,
       "rawGatewayRequest": {
-        "body": "{\"jsonrpc\": \"2.0\", \"id\": 840754730, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___update_address\", \"arguments\": {\"employeeId\": \"alice\", \"address\": {\"line1\": \"48 Pine St\", \"city\": \"Portland\", \"postalCode\": \"04102\", \"country\": \"US\", \"salary\": 250000}}}}"
+        "body": "{\"jsonrpc\": \"2.0\", \"id\": 356389819, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___update_address\", \"arguments\": {\"employeeId\": \"alice\", \"address\": {\"line1\": \"48 Pine St\", \"city\": \"Portland\", \"postalCode\": \"04102\", \"country\": \"US\", \"salary\": 250000}}}}"
       }
     }
   },
-  "response": null,
+  "response": {
+    "interceptorInputVersion": "1.0",
+    "mcp": {
+      "gatewayRequest": {
+        "path": "/mcp",
+        "httpMethod": "POST",
+        "headers": {
+          "x-amzn-tls-version": "TLSv1.3",
+          "x-amzn-vpce-config": "",
+          "Accept": "application/json, text/event-stream",
+          "User-Agent": "Python-urllib/3.12",
+          "X-Forwarded-Proto": "https",
+          "Host": "applied-odcs-shared-ahp4n92fyp.gateway.bedrock-agentcore.us-east-1.amazonaws.com",
+          "x-amzn-vpc-id": "",
+          "Accept-Encoding": "identity",
+          "x-amzn-vpce-policy-url": "",
+          "X-Forwarded-Port": "443",
+          "X-Amzn-Trace-Id": "Root=1-6aedd08b-08e5287f598d55ff6871b089",
+          "Authorization": "Bearer eyJraWQiOiJpWHo1d0h2Q2QrZmtSbzZMenBMWk4yZGFtUjBiWUpjbDBYRjRNZlpBekxjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIzNDE4NDRmOC00MDQxLTcwMzctNzAzZi00ZTU5OWYzN2ZmNjgiLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV9sV1dHWU0zM28iLCJjbGllbnRfaWQiOiIyYmJmYXI2ZTdsODhlbDUxZG9sNHVudHNpOSIsIm9yaWdpbl9qdGkiOiJhMjk3YzhlMS1lMGY4LTQxZjUtODYyNy03YjgxNDBhMzYzNzIiLCJldmVudF9pZCI6ImEwNGZmNGY3LTQzODQtNGRiMi05MGI1LWQ0ZjU2ZWUxNDIzMyIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTM5NzAzMTQsImV4cCI6MTc5Mzk3MzkxNCwiaWF0IjoxNzkzOTcwMzE0LCJqdGkiOiJiZGFlN2NlMi1iNTczLTRlYzktOTU4Zi1kOWY4YmRjODUwNWUiLCJ1c2VybmFtZSI6ImFsaWNlIn0.signature-redacted",
+          "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
+          "X-Forwarded-For": "203.0.113.10",
+          "Content-Length": "254",
+          "x-amzn-vpce-id": "",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": 356389819,
+          "jsonrpc": "2.0",
+          "method": "tools/call",
+          "params": {
+            "name": "hr___update_address",
+            "arguments": {
+              "employeeId": "alice",
+              "address": {
+                "country": "US",
+                "salary": 250000,
+                "city": "Portland",
+                "line1": "48 Pine St",
+                "postalCode": "04102"
+              }
+            }
+          }
+        },
+        "context": null
+      },
+      "gatewayResponse": {
+        "path": "/mcp",
+        "httpMethod": "POST",
+        "headers": {},
+        "body": {
+          "jsonrpc": "2.0",
+          "id": 356389819,
+          "error": {
+            "code": -32000,
+            "message": "UpdateAddress rejected; fields not permitted: homeAddress.salary"
+          }
+        },
+        "statusCode": 403,
+        "isStreamingResponse": false
+      },
+      "rawGatewayRequest": {
+        "body": "{\"jsonrpc\": \"2.0\", \"id\": 356389819, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___update_address\", \"arguments\": {\"employeeId\": \"alice\", \"address\": {\"line1\": \"48 Pine St\", \"city\": \"Portland\", \"postalCode\": \"04102\", \"country\": \"US\", \"salary\": 250000}}}}"
+      }
+    }
+  },
   "observed": {
     "status": 403,
     "body": {
       "jsonrpc": "2.0",
-      "id": 840754730,
+      "id": 356389819,
       "error": {
         "code": -32000,
         "message": "UpdateAddress rejected; fields not permitted: homeAddress.salary"

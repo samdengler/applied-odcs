@@ -118,3 +118,50 @@ Dave's refund changes order-1001's `status` to `refunded` in the tool Lambda's m
 - **cedarpy Linux wheel: confirmed.**  `uv pip install --python-platform aarch64-manylinux2014` installed `cedarpy-4.12.2` with `_internal.cpython-312-aarch64-linux-gnu.so`; the ARM_64 functions import it (cold start init 172 to 192 ms, first decision 139 to 193 ms).
 - **Cognito authorizer: worked.**  `GatewayAuthorizer.usingCognito` deployed on the first try; `usingCustomJwt` was not needed.
 - **Interceptors in us-east-1: available.**  No `CREATE_FAILED`.
+
+## Restricted field filter, November 6, 2026
+
+The request: the simplest response filter, hard coded to stop the most classified data, to show the plumbing from the registry to the response interceptor and a provable boundary.  `docs/response-filter.md` has the design and the results.  This section has how it was done.
+
+### Commits and tags
+
+cedar-odcs, on branch `withhold-unfilterable-results`, not merged.  applied-odcs, on branch `directory-target`, not merged, pinning `v0.2.10`.  Both branches start at their `main`, so `git merge --ff-only` lands them.
+
+| Tag | State |
+| --- | --- |
+| `v0.2.7` | **Bad.  `./check.sh` did not pass on it.**  One test failed, and the use case checks and proofs did not run.  Nothing pins it |
+| `v0.2.8` | `./check.sh` green.  Tool error text replaced, which also replaced the request leg's refusal messages (found live) |
+| `v0.2.9` | `./check.sh` green.  A failure reported in the result gets the fixed message.  Refusal messages still replaced |
+| `v0.2.10` | `./check.sh` green: 894 tests, every use case's check, 212 history proofs.  Refusal messages restored.  This is the one deployed |
+
+### Mistakes in this run
+
+- **`v0.2.7` was tagged and pushed with a test failing.**  The background `./check.sh` command ended in a `tail`, so the exit code reported was the `tail`'s, and the commit, tag, and push were chained onto a test run in one command.  The failing test, `test_non_text_content_items_are_kept`, pinned the behaviour being removed.  The tag was left in place, because moving a pushed tag is a force push, and the next version was cut on top.  To remove it: `git push origin :refs/tags/v0.2.7`.
+- **`v0.2.8` and `v0.2.9` lost the refusal messages, and `v0.2.9` was deployed for a few minutes.**  Calls were still refused with a 403.  No local test caught it, because refused calls were replayed only through the request leg.  `make demo` for `hr/` caught it, and refused calls are now replayed through both legs.
+- **The directory recordings were deleted by a shell loop.**  zsh does not word-split `$a`, so `make record` ran with bad arguments after the old files were removed.  They were recorded again.
+
+### Defaults taken
+
+- **Branches.**  The earlier work was committed to `main`.  This run was given permission to commit and push, and no branch was named, so it used a branch in each repository.
+- **A company directory for the example.**  Anyone may look up anyone in a directory, so the ownership and role questions do not arise.  With an HR profile the first question is why Bob sees Alice's salary.
+- **Hard coded means the rule.**  The two statements are fixed text and read no caller, role, or record.  The labels still come from the contract, because the plumbing is what the example shows.
+- **Fail closed on undeclared fields.**  A field the contract does not declare is cut, and a contract with a missing or misspelled level does not build.
+- **`forbid` beside a blanket `permit`,** in place of a narrow permit under default deny, because a forbid overrides every later permit.
+- **Non-text content items are dropped and the record still leaves.**  An undeclared field is cut the same way.  This reverses a test that pinned them being kept, which had no recorded reason.
+- **A fixed message for every tool failure,** with the original left to the logs.  A Gateway error on a call that passes the request leg gets it too.
+- **The relabel demo uses `personalPhone`,** added at `internal`, so the story is a security team reclassifying a field.
+- **`CEDAR_ODCS_RECORD` stays on in this stack,** so raw responses reach CloudWatch.  The SSNs are from the unassigned `000` area and every value is fake.
+- **Exported credentials for `make deploy` in this environment.**  `cdk` could not resolve the account from the SSO profile, so `make deploy` ran with `eval "$(aws configure export-credentials --format env)"` in the same shell, after checking the account is 009080466601.  The credentials were not printed or stored.
+
+### Observed
+
+- The Gateway does not hold a result to the tool's `outputSchema`: `passportNumber` reached the response interceptor.
+- A Lambda function target's failure arrives as a 200 with a result of `isError` and one text item holding JSON: `errorMessage`, `errorType`, `requestId`, and `stackTrace`.
+- The Gateway runs the response interceptor on the request leg's refusal, as a 403 with `error` in the body and no headers.
+- The target deployed in 53 seconds, with no replacement of the Gateway; its URL did not change.  The `hr.json` ETag stayed `0e874ea5...` through every publish, and `directory.json` is `286ca7c3...`.
+- One `make record` failed once with `Error 1` and worked on retry.  Its error output was cut off by a `tail`, so the cause was not seen.
+
+### Unverified
+
+- Non-text content items, other result keys, and a JSON-RPC `error` from a target were replayed from hand-built events and not seen live.  A Lambda function target cannot send them.  An MCP server target could.
+

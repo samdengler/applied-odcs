@@ -1,0 +1,130 @@
+{
+  "user": "alice",
+  "tool": "directory___look_up_employee",
+  "arguments": {
+    "employeeId": "alice"
+  },
+  "request": {
+    "interceptorInputVersion": "1.0",
+    "mcp": {
+      "gatewayRequest": {
+        "path": "/mcp",
+        "httpMethod": "POST",
+        "headers": {
+          "x-amzn-tls-version": "TLSv1.3",
+          "x-amzn-vpce-config": "",
+          "Accept": "application/json, text/event-stream",
+          "X-Forwarded-Proto": "https",
+          "User-Agent": "Python-urllib/3.12",
+          "Host": "applied-odcs-shared-ahp4n92fyp.gateway.bedrock-agentcore.us-east-1.amazonaws.com",
+          "x-amzn-vpc-id": "",
+          "Accept-Encoding": "identity",
+          "x-amzn-vpce-policy-url": "",
+          "X-Forwarded-Port": "443",
+          "X-Amzn-Trace-Id": "Root=1-6aedd017-74d9ca062aa3892e1e47fcf5",
+          "Authorization": "Bearer eyJraWQiOiJpWHo1d0h2Q2QrZmtSbzZMenBMWk4yZGFtUjBiWUpjbDBYRjRNZlpBekxjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIzNDE4NDRmOC00MDQxLTcwMzctNzAzZi00ZTU5OWYzN2ZmNjgiLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV9sV1dHWU0zM28iLCJjbGllbnRfaWQiOiIyYmJmYXI2ZTdsODhlbDUxZG9sNHVudHNpOSIsIm9yaWdpbl9qdGkiOiJlOWFiODA3NS00YTdhLTQ3ZjYtOWQzYi02MTE4NjdjOWExZjEiLCJldmVudF9pZCI6ImFiNWY3NjA0LTMzYjUtNDUyNS1iMzAxLTQ0N2EzN2RkNDYxOCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTM5NzAxOTgsImV4cCI6MTc5Mzk3Mzc5OCwiaWF0IjoxNzkzOTcwMTk4LCJqdGkiOiJlZDExOTZiOS1kMTgyLTQzNDEtOTUwMC01OGQ3NjRkM2Y0NzEiLCJ1c2VybmFtZSI6ImFsaWNlIn0.signature-redacted",
+          "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
+          "X-Forwarded-For": "203.0.113.10",
+          "Content-Length": "149",
+          "x-amzn-vpce-id": "",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": 421883272,
+          "jsonrpc": "2.0",
+          "method": "tools/call",
+          "params": {
+            "name": "directory___look_up_employee",
+            "arguments": {
+              "employeeId": "alice"
+            }
+          }
+        },
+        "context": null
+      },
+      "gatewayResponse": null,
+      "rawGatewayRequest": {
+        "body": "{\"jsonrpc\": \"2.0\", \"id\": 421883272, \"method\": \"tools/call\", \"params\": {\"name\": \"directory___look_up_employee\", \"arguments\": {\"employeeId\": \"alice\"}}}"
+      }
+    }
+  },
+  "response": {
+    "interceptorInputVersion": "1.0",
+    "mcp": {
+      "gatewayRequest": {
+        "path": "/mcp",
+        "httpMethod": "POST",
+        "headers": {
+          "x-amzn-tls-version": "TLSv1.3",
+          "x-amzn-vpce-config": "",
+          "Accept": "application/json, text/event-stream",
+          "User-Agent": "Python-urllib/3.12",
+          "X-Forwarded-Proto": "https",
+          "Host": "applied-odcs-shared-ahp4n92fyp.gateway.bedrock-agentcore.us-east-1.amazonaws.com",
+          "x-amzn-vpc-id": "",
+          "Accept-Encoding": "identity",
+          "x-amzn-vpce-policy-url": "",
+          "X-Forwarded-Port": "443",
+          "X-Amzn-Trace-Id": "Root=1-6aedd017-74d9ca062aa3892e1e47fcf5",
+          "Authorization": "Bearer eyJraWQiOiJpWHo1d0h2Q2QrZmtSbzZMenBMWk4yZGFtUjBiWUpjbDBYRjRNZlpBekxjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIzNDE4NDRmOC00MDQxLTcwMzctNzAzZi00ZTU5OWYzN2ZmNjgiLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV9sV1dHWU0zM28iLCJjbGllbnRfaWQiOiIyYmJmYXI2ZTdsODhlbDUxZG9sNHVudHNpOSIsIm9yaWdpbl9qdGkiOiJlOWFiODA3NS00YTdhLTQ3ZjYtOWQzYi02MTE4NjdjOWExZjEiLCJldmVudF9pZCI6ImFiNWY3NjA0LTMzYjUtNDUyNS1iMzAxLTQ0N2EzN2RkNDYxOCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTM5NzAxOTgsImV4cCI6MTc5Mzk3Mzc5OCwiaWF0IjoxNzkzOTcwMTk4LCJqdGkiOiJlZDExOTZiOS1kMTgyLTQzNDEtOTUwMC01OGQ3NjRkM2Y0NzEiLCJ1c2VybmFtZSI6ImFsaWNlIn0.signature-redacted",
+          "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
+          "X-Forwarded-For": "203.0.113.10",
+          "Content-Length": "149",
+          "x-amzn-vpce-id": "",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": 421883272,
+          "jsonrpc": "2.0",
+          "method": "tools/call",
+          "params": {
+            "name": "directory___look_up_employee",
+            "arguments": {
+              "employeeId": "alice"
+            }
+          }
+        },
+        "context": null
+      },
+      "gatewayResponse": {
+        "path": "/mcp",
+        "httpMethod": "POST",
+        "headers": {},
+        "body": {
+          "jsonrpc": "2.0",
+          "id": 421883272,
+          "result": {
+            "isError": false,
+            "content": [
+              {
+                "type": "text",
+                "text": "{\"employeeId\":\"alice\",\"name\":\"Alice Moreau\",\"workEmail\":\"alice@example.com\",\"personalPhone\":\"+1 207 555 0142\",\"ssn\":\"000-12-3456\",\"passportNumber\":\"X0000001\"}"
+              }
+            ]
+          }
+        },
+        "statusCode": 200,
+        "isStreamingResponse": false
+      },
+      "rawGatewayRequest": {
+        "body": "{\"jsonrpc\": \"2.0\", \"id\": 421883272, \"method\": \"tools/call\", \"params\": {\"name\": \"directory___look_up_employee\", \"arguments\": {\"employeeId\": \"alice\"}}}"
+      }
+    }
+  },
+  "observed": {
+    "status": 200,
+    "body": {
+      "jsonrpc": "2.0",
+      "id": 421883272,
+      "result": {
+        "isError": false,
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"employeeId\": \"alice\", \"name\": \"Alice Moreau\", \"workEmail\": \"alice@example.com\", \"personalPhone\": \"+1 207 555 0142\"}"
+          }
+        ]
+      }
+    }
+  }
+}

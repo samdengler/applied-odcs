@@ -21,8 +21,8 @@
           "Accept-Encoding": "identity",
           "x-amzn-vpce-policy-url": "",
           "X-Forwarded-Port": "443",
-          "X-Amzn-Trace-Id": "Root=1-6ae48755-5a8860872ded9aea59338ee7",
-          "Authorization": "Bearer eyJraWQiOiJpWHo1d0h2Q2QrZmtSbzZMenBMWk4yZGFtUjBiWUpjbDBYRjRNZlpBekxjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI3NDE4MTQ3OC1hMGIxLTcwZmYtMjk5Yy05OWFmYTUwZTNkYzciLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV9sV1dHWU0zM28iLCJjbGllbnRfaWQiOiIyYmJmYXI2ZTdsODhlbDUxZG9sNHVudHNpOSIsIm9yaWdpbl9qdGkiOiI3N2EwZWYwMy04ZDNjLTRjODQtODhlOS0yNGZlMDNkNWYwOGYiLCJldmVudF9pZCI6IjAzMjE4NDY1LWZkZjAtNDVkZS05MzFmLWQ0N2ZmYjEyMmUwZiIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTMzNjE3NDksImV4cCI6MTc5MzM2NTM0OSwiaWF0IjoxNzkzMzYxNzQ5LCJqdGkiOiIxNThkNzEyNC0yOWUxLTQ3N2YtODY2Ni0yZWNlYWM3YzNiMGQiLCJ1c2VybmFtZSI6ImJvYiJ9.signature-redacted",
+          "X-Amzn-Trace-Id": "Root=1-6aedd099-798efec336a70b3a01ba2ded",
+          "Authorization": "Bearer eyJraWQiOiJpWHo1d0h2Q2QrZmtSbzZMenBMWk4yZGFtUjBiWUpjbDBYRjRNZlpBekxjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI3NDE4MTQ3OC1hMGIxLTcwZmYtMjk5Yy05OWFmYTUwZTNkYzciLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV9sV1dHWU0zM28iLCJjbGllbnRfaWQiOiIyYmJmYXI2ZTdsODhlbDUxZG9sNHVudHNpOSIsIm9yaWdpbl9qdGkiOiI2NTI0ZTdjMi1mNjI0LTRlNjItYjZjNS03MmQ1ZTI5MTA1ZDgiLCJldmVudF9pZCI6IjQ4ZmI2Mjg1LWUyZGEtNGU1NS04ZmU1LTdhMGM1Y2FlZWNhOSIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTM5NzAzMjgsImV4cCI6MTc5Mzk3MzkyOCwiaWF0IjoxNzkzOTcwMzI4LCJqdGkiOiJjMzQ3ZjVmNy05NGFlLTRlNTUtODliNy0zMjM3ZDdjNWE2MGMiLCJ1c2VybmFtZSI6ImJvYiJ9.signature-redacted",
           "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
           "X-Forwarded-For": "203.0.113.10",
           "Content-Length": "137",
@@ -30,7 +30,7 @@
           "Content-Type": "application/json"
         },
         "body": {
-          "id": 593674702,
+          "id": 436169822,
           "jsonrpc": "2.0",
           "method": "tools/call",
           "params": {
@@ -44,16 +44,73 @@
       },
       "gatewayResponse": null,
       "rawGatewayRequest": {
-        "body": "{\"jsonrpc\": \"2.0\", \"id\": 593674702, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___get_profile\", \"arguments\": {\"employeeId\": \"alice\"}}}"
+        "body": "{\"jsonrpc\": \"2.0\", \"id\": 436169822, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___get_profile\", \"arguments\": {\"employeeId\": \"alice\"}}}"
       }
     }
   },
-  "response": null,
+  "response": {
+    "interceptorInputVersion": "1.0",
+    "mcp": {
+      "gatewayRequest": {
+        "path": "/mcp",
+        "httpMethod": "POST",
+        "headers": {
+          "x-amzn-tls-version": "TLSv1.3",
+          "x-amzn-vpce-config": "",
+          "Accept": "application/json, text/event-stream",
+          "User-Agent": "Python-urllib/3.12",
+          "X-Forwarded-Proto": "https",
+          "Host": "applied-odcs-shared-ahp4n92fyp.gateway.bedrock-agentcore.us-east-1.amazonaws.com",
+          "x-amzn-vpc-id": "",
+          "Accept-Encoding": "identity",
+          "x-amzn-vpce-policy-url": "",
+          "X-Forwarded-Port": "443",
+          "X-Amzn-Trace-Id": "Root=1-6aedd099-798efec336a70b3a01ba2ded",
+          "Authorization": "Bearer eyJraWQiOiJpWHo1d0h2Q2QrZmtSbzZMenBMWk4yZGFtUjBiWUpjbDBYRjRNZlpBekxjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI3NDE4MTQ3OC1hMGIxLTcwZmYtMjk5Yy05OWFmYTUwZTNkYzciLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV9sV1dHWU0zM28iLCJjbGllbnRfaWQiOiIyYmJmYXI2ZTdsODhlbDUxZG9sNHVudHNpOSIsIm9yaWdpbl9qdGkiOiI2NTI0ZTdjMi1mNjI0LTRlNjItYjZjNS03MmQ1ZTI5MTA1ZDgiLCJldmVudF9pZCI6IjQ4ZmI2Mjg1LWUyZGEtNGU1NS04ZmU1LTdhMGM1Y2FlZWNhOSIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTM5NzAzMjgsImV4cCI6MTc5Mzk3MzkyOCwiaWF0IjoxNzkzOTcwMzI4LCJqdGkiOiJjMzQ3ZjVmNy05NGFlLTRlNTUtODliNy0zMjM3ZDdjNWE2MGMiLCJ1c2VybmFtZSI6ImJvYiJ9.signature-redacted",
+          "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
+          "X-Forwarded-For": "203.0.113.10",
+          "Content-Length": "137",
+          "x-amzn-vpce-id": "",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": 436169822,
+          "jsonrpc": "2.0",
+          "method": "tools/call",
+          "params": {
+            "name": "hr___get_profile",
+            "arguments": {
+              "employeeId": "alice"
+            }
+          }
+        },
+        "context": null
+      },
+      "gatewayResponse": {
+        "path": "/mcp",
+        "httpMethod": "POST",
+        "headers": {},
+        "body": {
+          "jsonrpc": "2.0",
+          "id": 436169822,
+          "error": {
+            "code": -32000,
+            "message": "ViewProfile is not permitted for this caller"
+          }
+        },
+        "statusCode": 403,
+        "isStreamingResponse": false
+      },
+      "rawGatewayRequest": {
+        "body": "{\"jsonrpc\": \"2.0\", \"id\": 436169822, \"method\": \"tools/call\", \"params\": {\"name\": \"hr___get_profile\", \"arguments\": {\"employeeId\": \"alice\"}}}"
+      }
+    }
+  },
   "observed": {
     "status": 403,
     "body": {
       "jsonrpc": "2.0",
-      "id": 593674702,
+      "id": 436169822,
       "error": {
         "code": -32000,
         "message": "ViewProfile is not permitted for this caller"

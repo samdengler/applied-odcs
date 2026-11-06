@@ -1,5 +1,5 @@
-// The governed tool: Cognito standing in for Ping, the HR tool Lambda, the
-// shared cedar-odcs interceptor, the bucket it reads policy files from, and
+// The governed tools: Cognito standing in for Ping, the HR and directory tool
+// Lambdas, the shared cedar-odcs interceptor, the bucket it reads policy files from, and
 // the Gateway in MCP mode.  Plain aws-cdk-lib.  Each construct names the
 // Delta construct it maps onto, so the port is a class swap and no change
 // to the Python.
@@ -35,7 +35,8 @@ export class GovernedToolStack extends cdk.Stack {
       authFlows: { userPassword: true },
       accessTokenValidity: cdk.Duration.hours(1),
     });
-    // No groups: the HR policies read no role, only the caller's username.
+    // No groups: the HR policies read only the caller's username, and the
+    // directory policies read nothing of the caller.
 
     const logGroup = (id: string) => new logs.LogGroup(this, id, {
       retention: logs.RetentionDays.ONE_WEEK,
@@ -51,6 +52,18 @@ export class GovernedToolStack extends cdk.Stack {
       memorySize: 256,
       timeout: cdk.Duration.seconds(10),
       logGroup: logGroup('HrToolLogs'),
+    });
+
+    // The Lambda behind the second DeltaLambdaGatewayTarget: the directory
+    // API stand-in, which returns every field it stores.
+    const directoryTool = new lambda.Function(this, 'DirectoryTool', {
+      runtime: lambda.Runtime.PYTHON_3_12,
+      architecture: lambda.Architecture.ARM_64,
+      code: lambda.Code.fromAsset(path.join(REPO, 'directory', 'tool')),
+      handler: 'handler.handler',
+      memorySize: 256,
+      timeout: cdk.Duration.seconds(10),
+      logGroup: logGroup('DirectoryToolLogs'),
     });
 
     // Where the registry publishes each target's policy file, <target>.json
@@ -101,7 +114,7 @@ export class GovernedToolStack extends cdk.Stack {
     const gateway = new agentcore.Gateway(this, 'Gateway', {
       gatewayName: NAME,
       protocolConfiguration: new agentcore.McpProtocolConfiguration({
-        instructions: 'HR tools.  Every call is decided by cedar-odcs from the policy file published for its target.',
+        instructions: 'Governed tools.  Every call is decided by cedar-odcs from the policy file published for its target.',
         supportedVersions: [agentcore.MCPProtocolVersion.MCP_2025_06_18, agentcore.MCPProtocolVersion.MCP_2025_03_26],
       }),
       authorizerConfiguration: agentcore.GatewayAuthorizer.usingCognito({ userPool: users, allowedClients: [client] }),
@@ -120,6 +133,15 @@ export class GovernedToolStack extends cdk.Stack {
       toolSchema: agentcore.ToolSchema.fromLocalAsset(path.join(REPO, 'hr', 'tools.json')),
     });
 
+    // A second target on the same Gateway and the same interceptors.  Its
+    // tools are named directory___<tool>, and the interceptor reads
+    // directory.json for them, with no change to the interceptor.
+    gateway.addLambdaTarget('Directory', {
+      gatewayTargetName: 'directory',
+      lambdaFunction: directoryTool,
+      toolSchema: agentcore.ToolSchema.fromLocalAsset(path.join(REPO, 'directory', 'tools.json')),
+    });
+
     // SSM parameters in the Delta construct.
     new cdk.CfnOutput(this, 'GatewayUrl', { value: gateway.gatewayUrl ?? '' });
     new cdk.CfnOutput(this, 'GatewayId', { value: gateway.gatewayId });
@@ -130,5 +152,6 @@ export class GovernedToolStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'RequestLogGroup', { value: requestInterceptor.logGroup.logGroupName });
     new cdk.CfnOutput(this, 'ResponseLogGroup', { value: responseInterceptor.logGroup.logGroupName });
     new cdk.CfnOutput(this, 'ToolLogGroup', { value: hrTool.logGroup.logGroupName });
+    new cdk.CfnOutput(this, 'DirectoryToolLogGroup', { value: directoryTool.logGroup.logGroupName });
   }
 }

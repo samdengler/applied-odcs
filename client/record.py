@@ -3,7 +3,7 @@
 Makes the call through call.call, then reads the two interceptors' logged
 events (the handlers log them when CEDAR_ODCS_RECORD=1) from CloudWatch Logs,
 picks the ones whose JSON-RPC id matches, redacts bearer token signatures, and
-writes hr/tests/live/live-<user>-<tool>[-<employeeId>][-<extra field>...].json.
+writes <target>/tests/live/live-<user>-<tool>[-<employeeId>][-<extra field>...].json.
 """
 
 import importlib.util
@@ -15,10 +15,12 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-EVENTS = ROOT / "hr" / "tests" / "live"
 BEARER = re.compile(r"(Bearer\s+[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+)\.[A-Za-z0-9_\-=]*")
 POLL_SECONDS = 60
 POLL_EVERY = 5
+# A 403 may be the request leg's refusal, with no response event to find,
+# or the response leg's, so a 403 waits this long for one.
+POLL_REFUSED_SECONDS = 20
 
 
 def _load_call_module():
@@ -117,10 +119,12 @@ def main(argv: list[str]) -> int:
     outcome = call_module.call(user, tool, arguments)
     rpc_id = outcome["id"]
     denied = outcome["status"] == 403
+    target, _, bare = call_module.qualified(tool).partition(call_module.SEPARATOR)
 
     logs = boto3.client("logs", region_name=os.environ.get("AWS_REGION", "us-east-1"))
     request_event = response_event = None
     deadline = time.time() + POLL_SECONDS
+    refused_deadline = time.time() + POLL_REFUSED_SECONDS
     while True:
         if request_event is None:
             request_event = find_event(
@@ -128,13 +132,13 @@ def main(argv: list[str]) -> int:
                 "record request ",
                 rpc_id,
             )
-        if request_event is not None and response_event is None and not denied:
+        if request_event is not None and response_event is None:
             response_event = find_event(
                 fetch_messages(logs, os.environ["RESPONSE_LOG_GROUP"], "record response ", start_ms),
                 "record response ",
                 rpc_id,
             )
-        if request_event is not None and (denied or response_event is not None):
+        if request_event is not None and (response_event is not None or (denied and time.time() >= refused_deadline)):
             break
         if time.time() >= deadline:
             break
@@ -154,13 +158,15 @@ def main(argv: list[str]) -> int:
         "response": redact(response_event) if response_event is not None else None,
         "observed": {"status": outcome["status"], "body": outcome["body"]},
     }
-    EVENTS.mkdir(parents=True, exist_ok=True)
-    path = EVENTS / output_name(user, tool, arguments)
+    events = ROOT / target / "tests" / "live"
+    events.mkdir(parents=True, exist_ok=True)
+    path = events / output_name(user, bare, arguments)
     path.write_text(json.dumps(fixture, indent=2) + "\n")
     print(path)
     print(f"{user}  {tool}  {outcome['status']}  request={'yes'} response={'yes' if response_event else 'null'}")
 
-    tool_group = os.environ.get("TOOL_LOG_GROUP")
+    # The tool log with client_context lines is the default target's.
+    tool_group = os.environ.get("TOOL_LOG_GROUP") if target == call_module.DEFAULT_TARGET else None
     if tool_group:
         try:
             lines = [m for m in fetch_messages(logs, tool_group, "client_context ", start_ms) if "client_context " in m]

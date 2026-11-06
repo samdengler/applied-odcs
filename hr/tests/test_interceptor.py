@@ -4,11 +4,14 @@ forwarded, on whose record it names and each address line it sends,
 and each tool's result is decided on the response as its own model,
 cut to the fields the employee may read."""
 
+import copy
 import json
 from pathlib import Path
 
+import pytest
 from cedar_odcs.engine.calls import call
 from cedar_odcs.engine.enforce import Engine
+from cedar_odcs.gateway.handlers import TOOL_ERROR
 from hr.usecase import TOOLS, USE_CASE
 from interceptor.handler import Target
 from interceptor.policy_file import from_folder
@@ -36,6 +39,10 @@ def rejection(out: dict) -> str:
     result = out["mcp"]["transformedGatewayResponse"]
     assert result["statusCode"] == 403
     return result["body"]["error"]["message"]
+
+
+def rejection_text(out: dict) -> str:
+    return out["mcp"]["transformedGatewayResponse"]["body"]["error"]["message"]
 
 
 def payload(out: dict) -> dict:
@@ -96,6 +103,26 @@ def test_the_forwarded_call_is_the_call_as_sent():
     ev = event("request-alice-updates-own-address")
     out = HR.request_handler(ev)
     assert out["mcp"]["transformedGatewayRequest"]["body"] == ev["mcp"]["gatewayRequest"]["body"]
+
+
+# ---- a refusal through the response leg
+
+@pytest.mark.parametrize("name", ["request-bob-views-alice", "request-alice-updates-bobs-address",
+                                  "request-alice-sends-salary-in-address"])
+def test_a_refusal_comes_back_through_the_response_leg_in_the_same_words(name):
+    """The Gateway runs the response interceptor on the request leg's 403,
+    so the salary is still named at its contract path on the way back."""
+    ev = event(name)
+    sent = HR.request_handler(copy.deepcopy(ev))["mcp"]["transformedGatewayResponse"]
+    ev["mcp"]["gatewayResponse"] = sent
+    assert HR.response_handler(ev)["mcp"]["transformedGatewayResponse"] == sent
+
+
+def test_an_error_on_a_call_the_request_leg_passes_is_the_tools_and_is_replaced():
+    ev = event("request-alice-views-own-profile")
+    ev["mcp"]["gatewayResponse"] = {"statusCode": 200, "body": {"jsonrpc": "2.0", "id": 1, "error": {
+        "code": -32000, "message": "ViewProfile is not permitted; salary 128000"}}}
+    assert rejection_text(HR.response_handler(ev)) == TOOL_ERROR
 
 
 # ---- the response leg, one model per tool

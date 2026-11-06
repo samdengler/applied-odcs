@@ -8,5 +8,5 @@ import { GovernedToolStack } from '../lib/governed-tool-stack';
 const app = new cdk.App();
 new GovernedToolStack(app, 'AppliedOdcsShared', {
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'us-east-1' },
-  description: 'applied-odcs shared-interceptor: one governed MCP tool behind an AgentCore Gateway, decided by a shared cedar-odcs interceptor from a policy file in S3',
+  description: 'applied-odcs shared-interceptor: governed MCP tools behind an AgentCore Gateway, decided by a shared cedar-odcs interceptor from a policy file per target in S3',
 });

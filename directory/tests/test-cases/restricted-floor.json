@@ -1,0 +1,209 @@
+{
+  "policies": "policies.cedar",
+  "entities": [
+    "entities.json",
+    "tests/rows/entities.json"
+  ],
+  "shouldValidate": false,
+  "requests": [
+    {
+      "description": "alice looks up alice",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "LookUpEmployee"
+      },
+      "resource": {
+        "type": "Employee",
+        "id": "alice"
+      },
+      "context": {},
+      "decision": "Allow",
+      "reason": [
+        "everything-else-passes"
+      ],
+      "errors": []
+    },
+    {
+      "description": "bob looks up alice: the rule reads no caller",
+      "principal": {
+        "type": "User",
+        "id": "bob"
+      },
+      "action": {
+        "type": "Action",
+        "id": "LookUpEmployee"
+      },
+      "resource": {
+        "type": "Employee",
+        "id": "alice"
+      },
+      "context": {},
+      "decision": "Allow",
+      "reason": [
+        "everything-else-passes"
+      ],
+      "errors": []
+    },
+    {
+      "description": "bob reads alice's record: the rule reads no record",
+      "principal": {
+        "type": "User",
+        "id": "bob"
+      },
+      "action": {
+        "type": "Action",
+        "id": "ReadEmployee"
+      },
+      "resource": {
+        "type": "Employee",
+        "id": "alice"
+      },
+      "context": {},
+      "decision": "Allow",
+      "reason": [
+        "everything-else-passes"
+      ],
+      "errors": []
+    },
+    {
+      "description": "a field labelled public leaves",
+      "principal": {
+        "type": "User",
+        "id": "bob"
+      },
+      "action": {
+        "type": "Action",
+        "id": "ReadEmployeeField"
+      },
+      "resource": {
+        "type": "Employee",
+        "id": "alice"
+      },
+      "context": {
+        "field": "workEmail"
+      },
+      "decision": "Allow",
+      "reason": [
+        "everything-else-passes"
+      ],
+      "errors": []
+    },
+    {
+      "description": "a field labelled restricted does not leave, for alice",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "ReadEmployeeField"
+      },
+      "resource": {
+        "type": "Employee",
+        "id": "alice"
+      },
+      "context": {
+        "field": "ssn"
+      },
+      "decision": "Deny",
+      "reason": [
+        "restricted-never-leaves"
+      ],
+      "errors": []
+    },
+    {
+      "description": "a field labelled restricted does not leave, for bob",
+      "principal": {
+        "type": "User",
+        "id": "bob"
+      },
+      "action": {
+        "type": "Action",
+        "id": "ReadEmployeeField"
+      },
+      "resource": {
+        "type": "Employee",
+        "id": "alice"
+      },
+      "context": {
+        "field": "ssn"
+      },
+      "decision": "Deny",
+      "reason": [
+        "restricted-never-leaves"
+      ],
+      "errors": []
+    },
+    {
+      "description": "a field the contract does not declare does not leave",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "ReadEmployeeField"
+      },
+      "resource": {
+        "type": "Employee",
+        "id": "alice"
+      },
+      "context": {
+        "field": "passportNumber"
+      },
+      "decision": "Deny",
+      "reason": [
+        "restricted-never-leaves"
+      ],
+      "errors": []
+    },
+    {
+      "description": "a restricted name nested under an undeclared object does not leave",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "ReadEmployeeField"
+      },
+      "resource": {
+        "type": "Employee",
+        "id": "alice"
+      },
+      "context": {
+        "field": "hr.ssn"
+      },
+      "decision": "Deny",
+      "reason": [
+        "restricted-never-leaves"
+      ],
+      "errors": []
+    },
+    {
+      "description": "a field request naming no field is refused",
+      "principal": {
+        "type": "User",
+        "id": "alice"
+      },
+      "action": {
+        "type": "Action",
+        "id": "ReadEmployeeField"
+      },
+      "resource": {
+        "type": "Employee",
+        "id": "alice"
+      },
+      "context": {},
+      "decision": "Deny",
+      "reason": [
+        "restricted-never-leaves"
+      ],
+      "errors": []
+    }
+  ]
+}

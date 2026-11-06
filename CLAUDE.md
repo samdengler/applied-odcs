@@ -1,13 +1,18 @@
 # applied-odcs
 
-One governed MCP tool, deployed behind an AgentCore Gateway with cedar-odcs's
-two interceptors.  The plan is `docs/plan.md`; its Work order section is the
+Governed MCP tools, deployed behind an AgentCore Gateway with cedar-odcs's two
+interceptors.  The plan is `docs/plan.md`; its Work order section is the
 task list for an implementation session.  Decisions behind the plan are in the
 questions doc linked at the top of `docs/plan.md`.
 
 ## Layout and interfaces
 
-- `hr/` is the governed tool: the folder a tool team would copy.  The
+- `directory/` is the smallest governed tool: two policies that stop a field
+  labelled `restricted` from leaving a response, reading no caller, role, or
+  record.  It stays that small, because it exists to show the path from the
+  registry to the response interceptor and the proven boundary.  See
+  `docs/response-filter.md`.
+- `hr/` is a governed tool: the folder a tool team would copy.  The
   engine comes from cedar-odcs as a git dependency; nothing from
   `cedar_odcs/` is copied here.  It holds one rule, an employee sees
   their own profile and changes their own address, and stays that
@@ -35,7 +40,8 @@ questions doc linked at the top of `docs/plan.md`.
 - Commit messages in the cedar-odcs style: one sentence saying what changed
   and why, no type prefix, body only when the diff does not explain itself.
 - Generated outputs are never committed: `hr/contract/generated/`,
-  `hr/entities.json`, `build/`, `infra/cdk.out/`.
+  `hr/entities.json`, `directory/contract/generated/`, `directory/entities.json`,
+  `build/`, `infra/cdk.out/`.
 - Secrets are never committed.  The demo password lives in
   `.env.applied-odcs-shared` (ignored); `docs/shared-interceptor.md` says
   where it is, not what it is.

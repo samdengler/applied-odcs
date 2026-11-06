@@ -1,0 +1,45 @@
+# Written by hand: the directory has no catalog this project reads, so
+# there is no contract/unity/ and no pull.  cedar-odcs build reads this file.
+#
+# One model, the record look_up_employee returns.  Every field has a level
+# (classification), and the policies read the level and nothing else: a
+# field labelled restricted never leaves, and neither does a field the
+# contract does not declare.
+apiVersion: v3.2.0
+kind: DataContract
+id: 7c1f0a52-3e9b-4d21-8a44-91d2b6c0e711
+name: directory.employees
+version: 1.0.0
+status: active
+domain: hr
+description:
+  purpose: The company directory, as served by the directory API
+schema:
+- name: Employee
+  description: One employee's directory entry
+  properties:
+  - name: employeeId
+    logicalType: string
+    required: true
+    classification: public
+    description: The employee's id
+  - name: name
+    logicalType: string
+    required: true
+    classification: public
+    description: Name as shown in the directory
+  - name: workEmail
+    logicalType: string
+    required: true
+    classification: public
+    description: Work email address
+  - name: personalPhone
+    logicalType: string
+    required: true
+    classification: internal
+    description: Phone number for reaching a colleague out of hours
+  - name: ssn
+    logicalType: string
+    required: true
+    classification: restricted
+    description: Social Security number; the directory API returns it, and it stays behind the Gateway

@@ -1,0 +1,136 @@
+{
+  "user": "alice",
+  "tool": "directory___look_up_employee",
+  "arguments": {
+    "employeeId": "000-12-3456"
+  },
+  "request": {
+    "interceptorInputVersion": "1.0",
+    "mcp": {
+      "gatewayRequest": {
+        "path": "/mcp",
+        "httpMethod": "POST",
+        "headers": {
+          "x-amzn-tls-version": "TLSv1.3",
+          "x-amzn-vpce-config": "",
+          "Accept": "application/json, text/event-stream",
+          "X-Forwarded-Proto": "https",
+          "User-Agent": "Python-urllib/3.12",
+          "Host": "applied-odcs-shared-ahp4n92fyp.gateway.bedrock-agentcore.us-east-1.amazonaws.com",
+          "x-amzn-vpc-id": "",
+          "Accept-Encoding": "identity",
+          "x-amzn-vpce-policy-url": "",
+          "X-Forwarded-Port": "443",
+          "X-Amzn-Trace-Id": "Root=1-6aedd031-0a2756c44b07b40934b72219",
+          "Authorization": "Bearer eyJraWQiOiJpWHo1d0h2Q2QrZmtSbzZMenBMWk4yZGFtUjBiWUpjbDBYRjRNZlpBekxjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIzNDE4NDRmOC00MDQxLTcwMzctNzAzZi00ZTU5OWYzN2ZmNjgiLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV9sV1dHWU0zM28iLCJjbGllbnRfaWQiOiIyYmJmYXI2ZTdsODhlbDUxZG9sNHVudHNpOSIsIm9yaWdpbl9qdGkiOiI3OGNkOTZiMC1iNjNhLTQ2YTAtODkzOC05YWJhOGUwNjJlN2QiLCJldmVudF9pZCI6ImM1MjZiMjM5LTUzMDktNDdjNC1iMTVhLWJjOWY0MTMxMWMzZSIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTM5NzAyMjQsImV4cCI6MTc5Mzk3MzgyNCwiaWF0IjoxNzkzOTcwMjI0LCJqdGkiOiJmOGU1NjZhMS1kYjU5LTQyOTEtYjI3MC05ZDFiOThmNzhjZTQiLCJ1c2VybmFtZSI6ImFsaWNlIn0.signature-redacted",
+          "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
+          "X-Forwarded-For": "203.0.113.10",
+          "Content-Length": "155",
+          "x-amzn-vpce-id": "",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": 408863841,
+          "jsonrpc": "2.0",
+          "method": "tools/call",
+          "params": {
+            "name": "directory___look_up_employee",
+            "arguments": {
+              "employeeId": "000-12-3456"
+            }
+          }
+        },
+        "context": null
+      },
+      "gatewayResponse": null,
+      "rawGatewayRequest": {
+        "body": "{\"jsonrpc\": \"2.0\", \"id\": 408863841, \"method\": \"tools/call\", \"params\": {\"name\": \"directory___look_up_employee\", \"arguments\": {\"employeeId\": \"000-12-3456\"}}}"
+      }
+    }
+  },
+  "response": {
+    "interceptorInputVersion": "1.0",
+    "mcp": {
+      "gatewayRequest": {
+        "path": "/mcp",
+        "httpMethod": "POST",
+        "headers": {
+          "x-amzn-tls-version": "TLSv1.3",
+          "x-amzn-vpce-config": "",
+          "Accept": "application/json, text/event-stream",
+          "User-Agent": "Python-urllib/3.12",
+          "X-Forwarded-Proto": "https",
+          "Host": "applied-odcs-shared-ahp4n92fyp.gateway.bedrock-agentcore.us-east-1.amazonaws.com",
+          "x-amzn-vpc-id": "",
+          "Accept-Encoding": "identity",
+          "x-amzn-vpce-policy-url": "",
+          "X-Forwarded-Port": "443",
+          "X-Amzn-Trace-Id": "Root=1-6aedd031-0a2756c44b07b40934b72219",
+          "Authorization": "Bearer eyJraWQiOiJpWHo1d0h2Q2QrZmtSbzZMenBMWk4yZGFtUjBiWUpjbDBYRjRNZlpBekxjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIzNDE4NDRmOC00MDQxLTcwMzctNzAzZi00ZTU5OWYzN2ZmNjgiLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tL3VzLWVhc3QtMV9sV1dHWU0zM28iLCJjbGllbnRfaWQiOiIyYmJmYXI2ZTdsODhlbDUxZG9sNHVudHNpOSIsIm9yaWdpbl9qdGkiOiI3OGNkOTZiMC1iNjNhLTQ2YTAtODkzOC05YWJhOGUwNjJlN2QiLCJldmVudF9pZCI6ImM1MjZiMjM5LTUzMDktNDdjNC1iMTVhLWJjOWY0MTMxMWMzZSIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3OTM5NzAyMjQsImV4cCI6MTc5Mzk3MzgyNCwiaWF0IjoxNzkzOTcwMjI0LCJqdGkiOiJmOGU1NjZhMS1kYjU5LTQyOTEtYjI3MC05ZDFiOThmNzhjZTQiLCJ1c2VybmFtZSI6ImFsaWNlIn0.signature-redacted",
+          "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
+          "X-Forwarded-For": "203.0.113.10",
+          "Content-Length": "155",
+          "x-amzn-vpce-id": "",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": 408863841,
+          "jsonrpc": "2.0",
+          "method": "tools/call",
+          "params": {
+            "name": "directory___look_up_employee",
+            "arguments": {
+              "employeeId": "000-12-3456"
+            }
+          }
+        },
+        "context": null
+      },
+      "gatewayResponse": {
+        "path": "/mcp",
+        "httpMethod": "POST",
+        "headers": {},
+        "body": {
+          "jsonrpc": "2.0",
+          "id": 408863841,
+          "result": {
+            "content": [
+              {
+                "type": "text",
+                "text": "{\"errorMessage\": \"unknown employeeId: '000-12-3456'\", \"errorType\": \"ValueError\", \"requestId\": \"8dbb1b89-df38-4bb3-bb46-05aa2d44fe12\", \"stackTrace\": [\"  File \\\"/var/task/handler.py\\\", line 38, in handler\\n    record = TOOLS[name](event)\\n\", \"  File \\\"/var/task/handler.py\\\", line 23, in look_up_employee\\n    raise ValueError(f\\\"unknown employeeId: {employee_id!r}\\\")\\n\"]}"
+              }
+            ],
+            "_meta": {
+              "debug": {
+                "type": "text",
+                "text": "{\"errorMessage\": \"unknown employeeId: '000-12-3456'\", \"errorType\": \"ValueError\", \"requestId\": \"8dbb1b89-df38-4bb3-bb46-05aa2d44fe12\", \"stackTrace\": [\"  File \\\"/var/task/handler.py\\\", line 38, in handler\\n    record = TOOLS[name](event)\\n\", \"  File \\\"/var/task/handler.py\\\", line 23, in look_up_employee\\n    raise ValueError(f\\\"unknown employeeId: {employee_id!r}\\\")\\n\"]}"
+              }
+            },
+            "isError": true
+          }
+        },
+        "statusCode": 200,
+        "isStreamingResponse": false
+      },
+      "rawGatewayRequest": {
+        "body": "{\"jsonrpc\": \"2.0\", \"id\": 408863841, \"method\": \"tools/call\", \"params\": {\"name\": \"directory___look_up_employee\", \"arguments\": {\"employeeId\": \"000-12-3456\"}}}"
+      }
+    }
+  },
+  "observed": {
+    "status": 200,
+    "body": {
+      "jsonrpc": "2.0",
+      "id": 408863841,
+      "result": {
+        "isError": true,
+        "content": [
+          {
+            "type": "text",
+            "text": "the tool call failed; its error message is withheld"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -15,7 +15,8 @@ ROOT = Path(__file__).resolve().parents[1]
 ENV = ROOT / ".env.applied-odcs-shared"
 OUTPUTS = {"GatewayUrl": "GATEWAY_URL", "GatewayId": "GATEWAY_ID", "UserPoolId": "USER_POOL_ID",
            "ClientId": "CLIENT_ID", "Region": "AWS_REGION", "PolicyBucket": "POLICY_BUCKET", "RequestLogGroup": "REQUEST_LOG_GROUP",
-           "ResponseLogGroup": "RESPONSE_LOG_GROUP", "ToolLogGroup": "TOOL_LOG_GROUP"}
+           "ResponseLogGroup": "RESPONSE_LOG_GROUP", "ToolLogGroup": "TOOL_LOG_GROUP",
+           "DirectoryToolLogGroup": "DIRECTORY_TOOL_LOG_GROUP"}
 
 
 def _password() -> str:

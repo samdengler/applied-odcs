@@ -14,7 +14,8 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-PREFIX = "hr___"
+SEPARATOR = "___"
+DEFAULT_TARGET = "hr"
 
 
 def _load_token_module():
@@ -23,6 +24,12 @@ def _load_token_module():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def qualified(tool: str) -> str:
+    """The Gateway's name for a tool: directory___look_up_employee as given,
+    and a bare name such as get_profile on the default target."""
+    return tool if SEPARATOR in tool else f"{DEFAULT_TARGET}{SEPARATOR}{tool}"
 
 
 def parse_body(raw: str) -> dict | None:
@@ -83,7 +90,7 @@ def call(user: str, tool: str, arguments: dict) -> dict:
             "jsonrpc": "2.0",
             "id": rpc_id,
             "method": "tools/call",
-            "params": {"name": PREFIX + tool, "arguments": arguments},
+            "params": {"name": qualified(tool), "arguments": arguments},
         },
     )
     return {"id": rpc_id, "status": status, "body": body}

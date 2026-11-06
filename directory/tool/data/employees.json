@@ -1,0 +1,18 @@
+[
+  {
+    "employeeId": "alice",
+    "name": "Alice Moreau",
+    "workEmail": "alice@example.com",
+    "personalPhone": "+1 207 555 0142",
+    "ssn": "000-12-3456",
+    "passportNumber": "X0000001"
+  },
+  {
+    "employeeId": "bob",
+    "name": "Bob Okafor",
+    "workEmail": "bob@example.com",
+    "personalPhone": "+1 207 555 0187",
+    "ssn": "000-65-4321",
+    "passportNumber": "X0000002"
+  }
+]

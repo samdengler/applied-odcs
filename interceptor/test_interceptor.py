@@ -199,6 +199,10 @@ def test_live_recording_matches_the_shared_interceptor(path):
     out = shared.request(fixture["request"])["mcp"]
     if observed["status"] == 403 or "error" in (observed["body"] or {}):
         assert out["transformedGatewayResponse"]["body"]["error"]["message"] == observed["body"]["error"]["message"]
+        if fixture["response"] is not None:
+            # The Gateway runs the response leg on a refusal too.
+            back = shared.response(fixture["response"])["mcp"]["transformedGatewayResponse"]
+            assert back["body"]["error"]["message"] == observed["body"]["error"]["message"]
         return
     assert "transformedGatewayRequest" in out
     if fixture["response"] is not None:

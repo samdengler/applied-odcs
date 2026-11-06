@@ -23,6 +23,11 @@ def test_parse_body_reads_plain_json_and_sse():
     assert call.parse_body("") is None
 
 
+def test_a_bare_tool_name_is_on_the_default_target_and_a_full_name_is_kept():
+    assert call.qualified("get_profile") == "hr___get_profile"
+    assert call.qualified("directory___look_up_employee") == "directory___look_up_employee"
+
+
 def test_redact_replaces_the_signature_anywhere():
     out = record.redact({"h": {"Authorization": "Bearer aaa.bbb.ccc"}, "l": ["x Bearer d.e.f y"]})
     assert out["h"]["Authorization"] == "Bearer aaa.bbb.signature-redacted"

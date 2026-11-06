@@ -1,0 +1,22 @@
+// Every verb takes a User: whoever calls the tool.  The rule reads no
+// caller, so the type is here only because Cedar requires one.
+
+// The request leg's verb: look_up_employee names an employee.
+action LookUpEmployee appliesTo {
+  principal: [User],
+  resource: [Employee]
+};
+
+// The response leg's verbs: the record, then each field.
+action ReadEmployee appliesTo {
+  principal: [User],
+  resource: [Employee]
+};
+
+action ReadEmployeeField appliesTo {
+  principal: [User],
+  resource: [Employee],
+  context: {
+    field?: String
+  }
+};

@@ -1,0 +1,38 @@
+[
+  {
+    "name": "look_up_employee",
+    "description": "Look up a colleague in the company directory.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "employeeId": {
+          "type": "string",
+          "description": "The employee id, for example alice."
+        }
+      },
+      "required": [
+        "employeeId"
+      ]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "employeeId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "workEmail": {
+          "type": "string"
+        },
+        "personalPhone": {
+          "type": "string"
+        },
+        "ssn": {
+          "type": "string"
+        }
+      }
+    }
+  }
+]

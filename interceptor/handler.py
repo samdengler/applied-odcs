@@ -150,8 +150,11 @@ class Target:
     def response_handler(self, event: dict, context=None) -> dict:
         model = self.tool_models.get(_tool_name(event))
         # A tool the file does not name goes to the request handlers,
-        # which withhold its result as cedar-odcs does.
-        return (self.responses[model] if model else self.request).response_handler(event, context)
+        # which withhold its result as cedar-odcs does.  So does an error:
+        # the Gateway runs this leg on the request leg's refusal too, and
+        # only the request handlers can say that refusal again in its words.
+        handlers = self.responses[model] if model and not _holds_error(event) else self.request
+        return handlers.response_handler(event, context)
 
 
 @dataclass
@@ -190,6 +193,13 @@ class PolicyFiles:
             entry = _Entry(entry.handlers, entry.etag, self.clock())
         self._entries[target] = entry
         return entry.handlers
+
+
+def _holds_error(event: dict) -> bool:
+    try:
+        return "error" in event["mcp"]["gatewayResponse"]["body"]
+    except (KeyError, TypeError):
+        return False
 
 
 def _tool_name(event: dict) -> str | None:

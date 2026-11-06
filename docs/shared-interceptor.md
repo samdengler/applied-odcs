@@ -186,6 +186,14 @@ the request and response functions in the same second each time.  No
   case per model and re-roots a `writes` payload at its contract field,
   with no change to cedar-odcs.
 
+## Later changes
+
+On November 6 target `directory` joined this stack with no interceptor change
+beyond routing an error response to the request handlers, and the engine moved
+to cedar-odcs v0.2.10.  `docs/response-filter.md` has the results.  The Gateway
+runs the response interceptor on a request leg refusal too, which the recordings
+below did not show, because `make record` did not look for that event then.
+
 ## Open questions
 
 - **The two legs can disagree during a change.**  The request and

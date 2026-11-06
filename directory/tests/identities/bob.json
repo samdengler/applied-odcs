@@ -1,0 +1,5 @@
+{
+  "iss": "https://issuer.example",
+  "sub": "bob",
+  "aud": "directory-gateway"
+}
